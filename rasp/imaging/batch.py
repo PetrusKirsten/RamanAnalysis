@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 from io_map          import load_file
-from preprocess_map  import preprocess_maps, sum_intensity
+from preprocess_map  import preprocess_maps, get_sum
 from viz_topo        import plot_topography
 from viz_band        import extract_band, plot_band
 from _config         import config_figure, normalize
@@ -180,7 +180,7 @@ def batch_process(params: BatchParams):
                 plot_band(img,
                           center=center,
                           width=width,
-                          title=f'{label} cm⁻¹',
+                          title=f'{label} cm$^{-1}$',
                           compensation=params.compensation,
                           sigma=params.diff_sigma,
                           save=save_path)
@@ -208,6 +208,6 @@ if __name__ == "__main__":
     params = BatchParams(
         input_folder  ="./data/St CLs",
         output_folder ="./figures/maps_StkC",
-        bands=[(862,20,"862"), (1080,10,"1080"), (1650,30,"1650")],
+        bands=[(862, 20, "862"), (1080, 10, "1080"), (1650, 30, "1650")],
         n_clusters=3)
     batch_process(params)

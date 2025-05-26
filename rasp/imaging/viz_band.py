@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from _config import config_figure, normalize
-from preprocess_map import sum_intensity
+from preprocess_map import get_sum
 
 def extract_band(img, center, width):
     mask = (img.spectral_axis >= center-width) & (img.spectral_axis <= center+width)
@@ -13,7 +13,7 @@ def plot_band(img, center, width, title=None, compensation=None, sigma=0.9, save
     band = extract_band(img, center, width)
 
     if compensation == 'diff':
-        topo = sum_intensity(img)
+        topo = get_sum(img)
         diff = band - topo
         mask = topo > np.percentile(topo, 5)
         diff[~mask] = 0

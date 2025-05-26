@@ -1,6 +1,8 @@
 """Batch preprocessing functions for Raman maps."""
 import numpy as np	
 import ramanspy as rp
+from _config import config_figure
+from matplotlib import pyplot as plt
 from scipy.ndimage import median_filter, uniform_filter, gaussian_filter  # filters for outlier correction
 
 def preprocess_maps(images, region=(40, 1800), win_len=15):
@@ -61,8 +63,53 @@ def correct_outliers(array: np.ndarray, method: str = 'mean') -> np.ndarray:
     return corrected
 
 
-def sum_intensity(image: rp.SpectralImage):
+def get_sum(image: rp.SpectralImage):
     """Return topographic intensity map (sum or max)."""
 
     sum = np.sum(image.spectral_data, axis=-1)
     return correct_outliers(sum, method='mean')
+
+
+def plot_histogram(
+        data, bins: int = 50,
+        title: str = "Pixel Value Histogram",
+        figsize: tuple = (9, 5),
+        save = None ) -> None:
+    """
+    Plot a histogram of pixel values from a 2D map (topography, band, etc).
+
+    :param data: Either a 2D numpy array or a SpectralImage.
+    :type data: np.ndarray or rp.SpectralImage
+    :param bins: Number of histogram bins.
+    :type bins: int
+    :param title: Title of the histogram plot.
+    :type title: str
+    :param figsize: Figure size in inches.
+    :type figsize: tuple
+    """
+    # se for SpectralImage, extrai o 2D via sum_intensity
+
+    if hasattr(data, "spectral_data"):
+        arr2d = get_sum(data, method='mean')
+    else:
+        arr2d = data
+
+    ax = plt.subplots(figsize=figsize)
+
+    ax.set_title(title, color='k')
+    ax.set_xlabel("Normalized intensity", color='k')
+    ax.set_ylabel("Count", color='k')
+    ax.set_xlim((0, 1))
+    ax.tick_params(colors='k')
+    ax.set_xticks(np.linspace(0, 1, 11))
+    ax.grid(False)
+
+    for spine in ax.spines.values():
+        spine.set_edgecolor('k')
+
+    ax.hist(arr2d.flatten(), bins=bins, color='slategrey', alpha=0.8, rwidth=0.9)
+
+    plt.tight_layout()
+
+    if save:
+        plt.savefig(save, dpi=300)

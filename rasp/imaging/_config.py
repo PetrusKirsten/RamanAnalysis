@@ -6,6 +6,7 @@ def config_figure(fig_title: str,
                   size: tuple,
                   face: str = '#09141E',
                   edge: str = 'k') -> plt.Axes:
+    
     """
     Create a styled Matplotlib Axes with specified background and edge colors.
 
