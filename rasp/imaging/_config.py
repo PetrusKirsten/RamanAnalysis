@@ -34,12 +34,12 @@ def set_font(font_path: str):
         'font.family':      font_name,
         'text.color':       'k',
         'axes.labelcolor':  'k',
-        'font.size':        16,
-        'axes.titlesize':   16,
-        'axes.labelsize':   16,
-        'xtick.labelsize':  14,
-        'ytick.labelsize':  14,
-        'legend.fontsize':  14,
+        'font.size':        14,
+        'axes.titlesize':   14,
+        'axes.labelsize':   14,
+        'xtick.labelsize':  12,
+        'ytick.labelsize':  12,
+        'legend.fontsize':  12,
 
         'savefig.dpi':      300,
 
@@ -96,15 +96,15 @@ def config_bar(colorbar) -> None:
     """
 
     colorbar.ax.yaxis.set_tick_params(color='whitesmoke')
-    colorbar.ax.tick_params(color='whitesmoke', labelcolor='whitesmoke')
-    colorbar.outline.set_edgecolor("#020508")
+    colorbar.ax.tick_params(color='#09141E', labelcolor='whitesmoke')
+    colorbar.outline.set_edgecolor("#09141E")
     # colorbar.set_label('', color='whitesmoke', weight='bold', labelpad=8)
 
 
 def config_figure(fig_title: str,
                   size: tuple,
                   face: str = '#09141E',
-                  edge: str = "#020508") -> plt.Axes:
+                  edge: str = "#09141E") -> plt.Axes:
     
     """
     Create a styled Matplotlib Axes with specified background and edge colors.
@@ -141,4 +141,5 @@ def config_figure(fig_title: str,
 def normalize(arr, vmin=None, vmax=None):
     vmin = np.min(arr) if vmin is None else vmin
     vmax = np.max(arr) if vmax is None else vmax
+
     return (arr - vmin) / (vmax - vmin + 1e-12)

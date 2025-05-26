@@ -5,7 +5,7 @@ from _config import config_figure
 from matplotlib import pyplot as plt
 from scipy.ndimage import median_filter, uniform_filter, gaussian_filter  # filters for outlier correction
 
-def preprocess_maps(images, region=(40, 1800), win_len=15):
+def preprocess_maps(images, region=(40, 1780), win_len=15):
     """Apply the same pipeline to a list of spectral images."""
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=region),
@@ -16,7 +16,7 @@ def preprocess_maps(images, region=(40, 1800), win_len=15):
     return [routine.apply(img) for img in images]
 
 
-def detect_outliers(data: np.ndarray, threshold: float = 2) -> np.ndarray:
+def detect_outliers(data: np.ndarray, threshold: float = 1.67) -> np.ndarray:
     """
     Identify outliers using Z-score thresholding.
 
@@ -36,8 +36,8 @@ def detect_outliers(data: np.ndarray, threshold: float = 2) -> np.ndarray:
 
 def correct_outliers(array: np.ndarray, 
                      method: str = 'mean',
-                     low_pct: float = 4,
-                     high_pct: float = 96) -> np.ndarray:
+                     low_pct: float = 2,
+                     high_pct: float = 98) -> np.ndarray:
     """
     Replace detected outliers in a 2D array with locally filtered values.
 
@@ -49,24 +49,22 @@ def correct_outliers(array: np.ndarray,
     :rtype: np.ndarray
     """
 
-    mask = detect_outliers(array)
-    corrected = array.copy()
+    lo, hi = np.percentile(array, [low_pct, high_pct])
+    clipped = np.clip(array, lo, hi)
+
+    mask = detect_outliers(clipped)
+    corrected = clipped.copy()
 
     if method == 'median':
-        filtered = median_filter(array, size=4)
-
+        filtered = median_filter(clipped, size=5)
     elif method == 'mean':
-        filtered = uniform_filter(array, size=4)
-
+        filtered = uniform_filter(clipped, size=5)
     else:
         raise ValueError("Invalid method. Choose 'median' or 'mean'.")
 
     corrected[mask] = filtered[mask]
 
-    lo, hi = np.percentile(array, [low_pct, high_pct])
-    clipped = np.clip(corrected, lo, hi)
-
-    return clipped
+    return corrected
 
 
 def get_sum(image: rp.SpectralImage):

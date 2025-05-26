@@ -2,3 +2,5 @@
 /rasp/__pycache__
 /figures
 /data
+*.pyc
+/rasp/imaging/__pycache__
