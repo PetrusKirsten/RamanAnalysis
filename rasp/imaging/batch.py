@@ -17,7 +17,7 @@ from io_map          import load_file
 from preprocess_map  import preprocess_maps, get_sum
 from viz_topo        import plot_topography
 from viz_band        import extract_band, plot_band
-from _config         import config_figure, normalize
+from _config         import set_font, config_figure, normalize
 
 
 # ───────────────────────────────────────── dataclass de parâmetros
@@ -171,7 +171,7 @@ def batch_process(params: BatchParams):
 
         # 2.1 Topografia
         if params.do_topography:
-            plot_topography(img, save=sample_out / "topography.png")
+            plot_topography(img, title=f, save=sample_out / "topography.png")
 
         # 2.2 Bandas
         if params.do_bands and params.bands:
@@ -205,6 +205,10 @@ def batch_process(params: BatchParams):
     print(f"✅ Batch finished. Results in {run_dir}")
 
 if __name__ == "__main__":
+
+    font_path = ("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")   
+    set_font(font_path)
+
     params = BatchParams(
         input_folder  ="./data/St CLs",
         output_folder ="./figures/maps_StkC",

@@ -16,7 +16,7 @@ def preprocess_maps(images, region=(40, 1800), win_len=15):
     return [routine.apply(img) for img in images]
 
 
-def detect_outliers(data: np.ndarray, threshold: float = 3) -> np.ndarray:
+def detect_outliers(data: np.ndarray, threshold: float = 2) -> np.ndarray:
     """
     Identify outliers using Z-score thresholding.
 
@@ -34,7 +34,10 @@ def detect_outliers(data: np.ndarray, threshold: float = 3) -> np.ndarray:
     return np.abs(data - mean) > threshold * std
 
 
-def correct_outliers(array: np.ndarray, method: str = 'mean') -> np.ndarray:
+def correct_outliers(array: np.ndarray, 
+                     method: str = 'mean',
+                     low_pct: float = 4,
+                     high_pct: float = 96) -> np.ndarray:
     """
     Replace detected outliers in a 2D array with locally filtered values.
 
@@ -50,24 +53,26 @@ def correct_outliers(array: np.ndarray, method: str = 'mean') -> np.ndarray:
     corrected = array.copy()
 
     if method == 'median':
-        filtered = median_filter(array, size=3)
+        filtered = median_filter(array, size=4)
 
     elif method == 'mean':
-        filtered = uniform_filter(array, size=3)
+        filtered = uniform_filter(array, size=4)
 
     else:
         raise ValueError("Invalid method. Choose 'median' or 'mean'.")
 
     corrected[mask] = filtered[mask]
 
-    return corrected
+    lo, hi = np.percentile(array, [low_pct, high_pct])
+    clipped = np.clip(corrected, lo, hi)
+
+    return clipped
 
 
 def get_sum(image: rp.SpectralImage):
     """Return topographic intensity map (sum or max)."""
 
-    sum = np.sum(image.spectral_data, axis=-1)
-    return correct_outliers(sum, method='mean')
+    return np.sum(image.spectral_data, axis=-1)
 
 
 def plot_histogram(
