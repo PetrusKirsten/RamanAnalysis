@@ -35,7 +35,7 @@ def detect_outliers(data: np.ndarray, threshold: float = 1.67) -> np.ndarray:
 
 
 def correct_outliers(array: np.ndarray, 
-                     method: str = 'mean',
+                     method: str = 'median',
                      low_pct: float = 2,
                      high_pct: float = 98) -> np.ndarray:
     """
@@ -56,9 +56,9 @@ def correct_outliers(array: np.ndarray,
     corrected = clipped.copy()
 
     if method == 'median':
-        filtered = median_filter(clipped, size=5)
+        filtered = median_filter(clipped, size=3)
     elif method == 'mean':
-        filtered = uniform_filter(clipped, size=5)
+        filtered = uniform_filter(clipped, size=3)
     else:
         raise ValueError("Invalid method. Choose 'median' or 'mean'.")
 
