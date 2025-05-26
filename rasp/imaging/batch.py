@@ -1,17 +1,20 @@
 # rasp/imaging/batch.py  ← coloque no lugar do skeleton
-from __future__ import annotations
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import json, datetime
+from __future__ import annotations
+from pathlib import Path
 from typing import Sequence, Tuple, List, Literal
+from dataclasses import dataclass, asdict
 
 import numpy as np
 from tqdm import tqdm
-
 import ramanspy as rp
-from scipy.ndimage import gaussian_filter
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
+
+from matplotlib     import pyplot as plt
+
+from scipy.ndimage  import gaussian_filter
+
+from sklearn.decomposition  import PCA
+from sklearn.cluster        import KMeans
 
 from io_map          import load_file
 from preprocess_map  import preprocess_maps, get_sum
@@ -68,8 +71,9 @@ def _plot_multiband_rgb(img: rp.SpectralImage,
                         bands: Sequence[BandTuple],
                         idx_rgb: Tuple[int, int, int],
                         out: Path):
+    
     """Cria falso-RGB a partir de 3 bandas."""
-    import matplotlib.pyplot as plt
+    
     from matplotlib.colors import Normalize
     from .viz_band import extract_band
 
