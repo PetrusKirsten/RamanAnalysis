@@ -32,7 +32,7 @@ def correct_shading(map_2d: np.ndarray, sigma: float = 7.0) -> np.ndarray:
     return map_2d / background
 
 
-def plot_topography(img, cmap='pink', title='Topography', save=None):
+def plot_topography(img, title='Topography', save=None):
     
     ax = config_figure(title, (2000, 2000))
     
@@ -40,7 +40,7 @@ def plot_topography(img, cmap='pink', title='Topography', save=None):
     topo_corrected = correct_outliers(topo)
     # topo_corrected = correct_shading(correct_outliers(topo))
     
-    im = ax.imshow(topo_corrected, cmap=cmap)
+    im = ax.imshow(topo_corrected, cmap='pink')
     cbar = plt.colorbar(im, ax=ax, fraction=0.04, pad=0.04)
     config_bar(cbar)
     scale_ticks(ax)

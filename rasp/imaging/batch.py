@@ -27,12 +27,12 @@ BandTuple = Tuple[int, int, str]   # (center, width, label)
 class BatchParams:
     input_folder   : str
     output_folder  : str
-    region         : Tuple[int, int] = (280, 1800)
+    region         : Tuple[int, int] = (280, 1780)
     win_len        : int = 15
 
     # ─ mapas a gerar ─────────────────
-    do_topography  : bool = True
-    do_bands       : bool = False
+    do_topography  : bool = False
+    do_bands       : bool = True
     do_multiband   : bool = False
     do_kmeans      : bool = False
     do_pca         : bool = False
@@ -180,9 +180,6 @@ def batch_process(params: BatchParams):
                 plot_band(img,
                           center=center,
                           width=width,
-                          title=f'{label} cm$^{-1}$',
-                          compensation=params.compensation,
-                          sigma=params.diff_sigma,
                           save=save_path)
 
         # 2.3 RGB multiband
@@ -212,6 +209,7 @@ if __name__ == "__main__":
     params = BatchParams(
         input_folder  ="./data/St CLs",
         output_folder ="./figures/maps_StkC",
-        bands=[(862, 20, "862"), (1080, 10, "1080"), (1650, 30, "1650")],
+        bands=[(851, 5, "851"), (939, 10, "939"), (1650, 30, "1650")],
         n_clusters=3)
+    
     batch_process(params)

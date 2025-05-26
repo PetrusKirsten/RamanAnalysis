@@ -10,7 +10,7 @@ def preprocess_maps(images, region=(40, 1780), win_len=15):
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=region),
         rp.preprocessing.denoise.SavGol(window_length=win_len, polyorder=3),
-        # rp.preprocessing.baseline.ASLS(),
+        rp.preprocessing.baseline.ASLS(),
         # rp.preprocessing.normalise.MinMax()
     ])
     return [routine.apply(img) for img in images]
