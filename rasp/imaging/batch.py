@@ -174,7 +174,9 @@ def batch_process(params: BatchParams):
 
         # 2.1 Topografia
         if params.do_topography:
-            plot_topography(img, title=f, save=sample_out / "topography.png")
+            plot_topography(img, title=f, save=sample_out / "topography_raw.png")
+            plot_topography(img, title=f, save=sample_out / "topography_corrected.png",
+                            correct_outliers_on=True, correct_shading_on=True)
 
         # 2.2 Bandas
         if params.do_bands and params.bands:

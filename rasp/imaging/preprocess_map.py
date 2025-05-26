@@ -68,6 +68,28 @@ def correct_outliers(array: np.ndarray,
     return corrected
 
 
+def correct_shading(map_2d: np.ndarray, sigma: float = 6.0) -> np.ndarray:
+    """
+    Corrige efeito de shading/foco num mapa 2D qualquer (banda ou topografia).
+
+    Parameters
+    ----------
+    map_2d : np.ndarray
+        Mapa 2D (topografia ou banda)
+    sigma : float
+        Largura do filtro Gaussiano para suavizar o background
+
+    Returns
+    -------
+    corrected : np.ndarray
+        Mapa corrigido
+    """
+    
+    background = gaussian_filter(map_2d, sigma=sigma) + 1e-12  # evita divisão por zero
+    
+    return map_2d / background
+
+
 def get_sum(image: rp.SpectralImage):
     """Return topographic intensity map (sum or max)."""
 
