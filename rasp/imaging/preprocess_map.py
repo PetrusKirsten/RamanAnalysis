@@ -85,8 +85,14 @@ def correct_shading(map_2d: np.ndarray, sigma: float = 6.0) -> np.ndarray:
         Mapa corrigido
     """
     
-    background = gaussian_filter(map_2d, sigma=sigma) + 1e-12  # evita divisão por zero
+    def adjust_contrast(img, lower=1, upper=99):
+        """Mapeia os percentis [lower, upper] para [0,1]"""
+        p_low, p_high = np.percentile(img, (lower, upper))
+        return np.clip((img - p_low) / (p_high - p_low + 1e-12), 0, 1)
+
+    background = gaussian_filter(map_2d, sigma=sigma) + 1e-12 
     
+    # return adjust_contrast(map_2d / background)
     return map_2d / background
 
 

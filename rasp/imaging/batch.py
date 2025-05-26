@@ -35,16 +35,13 @@ class BatchParams:
 
     # ─ mapas a gerar ─────────────────
     do_topography  : bool = True
-    do_bands       : bool = False
+    do_bands       : bool = True
     do_multiband   : bool = False
     do_kmeans      : bool = False
     do_pca         : bool = False
 
     # opções band-map
-    bands          : List[BandTuple] | None = None         # exigir se do_bands=True
-    compensation   : Literal['raw', 'global', 'diff'] = 'diff'
-    diff_sigma     : float = 0.9
-    mask_percentile: float = 5.0
+    bands          : List[BandTuple] | None = None
 
     # multiband RGB: passa índices (0,1,2) referindo-se a self.bands
     multiband_idx  : Tuple[int, int, int] = (0, 1, 2)
@@ -171,7 +168,8 @@ def batch_process(params: BatchParams):
         sample_name = f.stem.replace(' ', '_')
         sample_out  = run_dir / sample_name
         sample_out.mkdir(exist_ok=True)
-
+        # TODO: 2.0 Spectra
+        
         # 2.1 Topografia
         if params.do_topography:
             plot_topography(img, title=f, save=sample_out / "topography_raw.png")
@@ -181,11 +179,15 @@ def batch_process(params: BatchParams):
         # 2.2 Bandas
         if params.do_bands and params.bands:
             for center, width, label in params.bands:
-                save_path = sample_out / f'band_{label}.png'
                 plot_band(img,
-                          center=center,
-                          width=width,
-                          save=save_path)
+                          center = center,
+                          width  = width,
+                          save   = sample_out / f'band_{label}_raw.png')
+                plot_band(img,
+                          center = center,
+                          width  = width,
+                          save   = sample_out / f'band_{label}_corrected.png',
+                          correct_outliers_on=True, correct_shading_on=True)
 
         # 2.3 RGB multiband
         if params.do_multiband and params.bands and len(params.bands) >= 3:
@@ -213,8 +215,8 @@ if __name__ == "__main__":
 
     params = BatchParams(
         input_folder  ="./data/St CLs",
-        output_folder ="./figures/maps_StkC",
-        bands=[(851, 5, "851"), (939, 10, "939"), (1650, 30, "1650")],
+        output_folder ="./figures/maps_St",
+        bands=[(939, 10, "939"), (1650, 30, "1650")],
         n_clusters=3)
     
     batch_process(params)

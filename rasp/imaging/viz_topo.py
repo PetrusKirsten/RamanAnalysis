@@ -1,7 +1,5 @@
 """Topography visualisation."""
 
-import numpy as np
-import ramanspy as rp
 import matplotlib.pyplot as plt
 
 from _config        import config_figure, config_bar, scale_ticks
