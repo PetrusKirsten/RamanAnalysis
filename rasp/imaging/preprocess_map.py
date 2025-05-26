@@ -5,18 +5,19 @@ from _config import config_figure
 from matplotlib import pyplot as plt
 from scipy.ndimage import median_filter, uniform_filter, gaussian_filter  # filters for outlier correction
 
-def preprocess_maps(images, region=(40, 1780), win_len=15):
+def preprocess_maps(images, region=(40, 1780), win_len=7):
     """Apply the same pipeline to a list of spectral images."""
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=region),
-        rp.preprocessing.denoise.SavGol(window_length=win_len, polyorder=3),
-        rp.preprocessing.baseline.ASLS(),
+        rp.preprocessing.despike.WhitakerHayes(kernel_size=8, threshold=15),
+        rp.preprocessing.denoise.SavGol(window_length=win_len, polyorder=2),
+        # rp.preprocessing.baseline.ASLS(),
         # rp.preprocessing.normalise.MinMax()
     ])
     return [routine.apply(img) for img in images]
 
 
-def detect_outliers(data: np.ndarray, threshold: float = 1.67) -> np.ndarray:
+def detect_outliers(data: np.ndarray, threshold: float = 3) -> np.ndarray:
     """
     Identify outliers using Z-score thresholding.
 

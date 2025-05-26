@@ -2,13 +2,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.ndimage  import gaussian_filter
-from _config        import config_figure, config_bar, scale_ticks
 from preprocess_map import correct_outliers
+from _config        import config_figure, config_bar, scale_ticks
 
 
 def extract_band(img, center, width):
-    mask = (img.spectral_axis >= center-width) & (img.spectral_axis <= center+width)
+    mask = (img.spectral_axis >= center - width) & (img.spectral_axis <= center + width)
 
     return np.sum(img.spectral_data[..., mask], axis=-1)
 

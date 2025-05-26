@@ -1,6 +1,6 @@
+from __future__ import annotations
 # rasp/imaging/batch.py  ← coloque no lugar do skeleton
 import json, datetime
-from __future__ import annotations
 from pathlib import Path
 from typing import Sequence, Tuple, List, Literal
 from dataclasses import dataclass, asdict
@@ -17,9 +17,9 @@ from sklearn.decomposition  import PCA
 from sklearn.cluster        import KMeans
 
 from io_map          import load_file
-from preprocess_map  import preprocess_maps, get_sum
+from preprocess_map  import preprocess_maps
 from viz_topo        import plot_topography
-from viz_band        import extract_band, plot_band
+from viz_band        import plot_band
 from _config         import set_font, config_figure, normalize
 
 
@@ -30,12 +30,12 @@ BandTuple = Tuple[int, int, str]   # (center, width, label)
 class BatchParams:
     input_folder   : str
     output_folder  : str
-    region         : Tuple[int, int] = (280, 1780)
-    win_len        : int = 15
+    region         : Tuple[int, int] = (40, 1780)
+    win_len        : int = 7
 
     # ─ mapas a gerar ─────────────────
-    do_topography  : bool = False
-    do_bands       : bool = True
+    do_topography  : bool = True
+    do_bands       : bool = False
     do_multiband   : bool = False
     do_kmeans      : bool = False
     do_pca         : bool = False
@@ -142,13 +142,11 @@ def batch_process(params: BatchParams):
         raise FileNotFoundError(f"No .txt maps found in {inp}")
 
     # 1) Discover and load all map files
-    raw_maps = []
     map_files = [f for f in inp.glob("*.txt") if "Map" in f.name]
-
-    # log.info(f"Found {len(map_files)} map files:"); time.sleep(.5)
     for f in map_files:
         print(f'\t\t→ {f.name}')
-    # time.sleep(.5)
+
+    raw_maps = []
     for f in tqdm(map_files, desc="Loading maps", unit="file"):
         raw_maps.append(load_file(str(f)))
 
@@ -169,6 +167,7 @@ def batch_process(params: BatchParams):
 
     # ─ 2. Loop por mapa
     for f, img in tqdm(list(zip(txt_files, maps_pp)), desc="Processing maps"):
+       
         sample_name = f.stem.replace(' ', '_')
         sample_out  = run_dir / sample_name
         sample_out.mkdir(exist_ok=True)
