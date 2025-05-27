@@ -18,9 +18,10 @@ from sklearn.cluster        import KMeans
 
 from io_map          import load_file
 from preprocess_map  import preprocess_maps
+from _config         import set_font, config_figure, normalize
 from viz_topo        import plot_topography
 from viz_band        import plot_band
-from _config         import set_font, config_figure, normalize
+from viz_spectrum    import plot_mean_spectrum
 
 
 # ───────────────────────────────────────── dataclass de parâmetros
@@ -30,11 +31,12 @@ BandTuple = Tuple[int, int, str]   # (center, width, label)
 class BatchParams:
     input_folder   : str
     output_folder  : str
-    region         : Tuple[int, int] = (40, 1780)
+    region         : Tuple[int, int] = (280, 1780)
     win_len        : int = 7
 
     # ─ mapas a gerar ─────────────────
-    do_topography  : bool = True
+    do_spectra     : bool = True
+    do_topography  : bool = False
     do_bands       : bool = True
     do_multiband   : bool = False
     do_kmeans      : bool = False
@@ -130,8 +132,7 @@ def batch_process(params: BatchParams):
     ... )
     >>> batch_process(params)
     """
-    inp  = Path(params.input_folder)
-    outb = Path(params.output_folder)
+    inp, outb  = Path(params.input_folder), Path(params.output_folder)
     outb.mkdir(parents=True, exist_ok=True)
 
     txt_files = sorted(f for f in inp.glob("*.txt") if f.is_file())
@@ -168,12 +169,17 @@ def batch_process(params: BatchParams):
         sample_name = f.stem.replace(' ', '_')
         sample_out  = run_dir / sample_name
         sample_out.mkdir(exist_ok=True)
-        # TODO: 2.0 Spectra
+        
+        # 2.0 Spectra
+        if params.do_spectra:
+            plot_mean_spectrum(img, save=sample_out / "spectra.png")
         
         # 2.1 Topografia
         if params.do_topography:
-            plot_topography(img, title=f, save=sample_out / "topography_raw.png")
-            plot_topography(img, title=f, save=sample_out / "topography_corrected.png",
+            plot_topography(img, title=f, save=sample_out / "topography-raw.png")
+            plot_topography(img, title=f, save=sample_out / "topography-outliers_correction.png",
+                            correct_outliers_on=True, correct_shading_on=False)
+            plot_topography(img, title=f, save=sample_out / "topographyv-outliersAndShading_correction.png",
                             correct_outliers_on=True, correct_shading_on=True)
 
         # 2.2 Bandas
@@ -182,11 +188,16 @@ def batch_process(params: BatchParams):
                 plot_band(img,
                           center = center,
                           width  = width,
-                          save   = sample_out / f'band_{label}_raw.png')
+                          save   = sample_out / f'band_{label}-raw.png')
                 plot_band(img,
                           center = center,
                           width  = width,
-                          save   = sample_out / f'band_{label}_corrected.png',
+                          save   = sample_out / f'band_{label}-outliers_correction.png',
+                          correct_outliers_on=True, correct_shading_on=False)
+                plot_band(img,
+                          center = center,
+                          width  = width,
+                          save   = sample_out / f'band_{label}-outliersAndShading_correction.png',
                           correct_outliers_on=True, correct_shading_on=True)
 
         # 2.3 RGB multiband
@@ -210,13 +221,12 @@ def batch_process(params: BatchParams):
 
 if __name__ == "__main__":
 
-    font_path = ("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")   
-    set_font(font_path)
+    set_font("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")
 
     params = BatchParams(
-        input_folder  ="./data/St CLs",
-        output_folder ="./figures/maps_St",
-        bands=[(939, 10, "939"), (1650, 30, "1650")],
+        input_folder  ="./data/St kC CLs",
+        output_folder ="./figures/maps-St_kC",
+        bands=[(851, 5, "851"), (939, 10, "939"), (1650, 30, "1650")],
         n_clusters=3)
     
     batch_process(params)

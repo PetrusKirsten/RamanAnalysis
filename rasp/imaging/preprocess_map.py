@@ -11,7 +11,7 @@ def preprocess_maps(images, region=(40, 1780), win_len=7):
         rp.preprocessing.misc.Cropper(region=region),
         rp.preprocessing.despike.WhitakerHayes(kernel_size=8, threshold=15),
         rp.preprocessing.denoise.SavGol(window_length=win_len, polyorder=2),
-        # rp.preprocessing.baseline.ASLS(),
+        rp.preprocessing.baseline.ASLS(),
         # rp.preprocessing.normalise.MinMax()
     ])
     return [routine.apply(img) for img in images]

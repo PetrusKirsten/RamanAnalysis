@@ -32,3 +32,4 @@ def plot_band(img, center, width, title=None, save=None,
 
     if save:
         plt.savefig(save, dpi=300)
+        plt.close()

@@ -24,3 +24,4 @@ def plot_topography(img, title='Topography', save=None,
     
     if save:
         plt.savefig(save, dpi=300)
+        plt.close()
