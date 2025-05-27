@@ -22,6 +22,8 @@ from _config         import set_font, config_figure, normalize
 from viz_topo        import plot_topography
 from viz_band        import plot_band
 from viz_spectrum    import plot_mean_spectrum
+from viz_multiband   import plot_multiband, plot_multiband_rgb
+from viz_kmeans      import plot_kmeans
 
 
 # ───────────────────────────────────────── dataclass de parâmetros
@@ -37,9 +39,9 @@ class BatchParams:
     # ─ mapas a gerar ─────────────────
     do_spectra     : bool = True
     do_topography  : bool = False
-    do_bands       : bool = True
-    do_multiband   : bool = False
-    do_kmeans      : bool = False
+    do_bands       : bool = False
+    do_multiband   : bool = True
+    do_kmeans      : bool = True
     do_pca         : bool = False
 
     # opções band-map
@@ -64,43 +66,6 @@ def _make_out_dir(base: Path, sample_name: str) -> Path:
     d = base / sample_name
     d.mkdir(parents=True, exist_ok=True)
     return d
-
-
-def _plot_multiband_rgb(img: rp.SpectralImage,
-                        bands: Sequence[BandTuple],
-                        idx_rgb: Tuple[int, int, int],
-                        out: Path):
-    
-    """Cria falso-RGB a partir de 3 bandas."""
-    
-    from matplotlib.colors import Normalize
-    from .viz_band import extract_band
-
-    centers = [bands[i][0] for i in idx_rgb]
-    widths  = [bands[i][1] for i in idx_rgb]
-
-    layers = [extract_band(img, c, w) for c, w in zip(centers, widths)]
-    stacks = np.stack([normalize(L) for L in layers], axis=-1)
-
-    ax = config_figure(f"RGB {centers}", (1400, 1200))
-    ax.imshow(stacks)
-    ax.axis('off')
-    plt.savefig(out, dpi=300)
-    plt.close()
-
-
-def _plot_kmeans(img: rp.SpectralImage, n_clusters: int, out: Path):
-    from matplotlib import cm
-    spec_mat = img.spectral_data.reshape(-1, img.spectral_data.shape[-1])
-    km = KMeans(n_clusters=n_clusters, random_state=0).fit(spec_mat)
-    labels = km.labels_.reshape(img.spectral_data.shape[:-1])
-    cmap = cm.get_cmap('tab10', n_clusters)
-
-    ax = config_figure(f'k-means (k={n_clusters})', (1400, 1200))
-    ax.imshow(labels, cmap=cmap, interpolation='nearest')
-    ax.axis('off')
-    plt.savefig(out, dpi=300)
-    plt.close()
 
 
 def _plot_pca_maps(img: rp.SpectralImage, n_pc: int, out_dir: Path):
@@ -179,7 +144,7 @@ def batch_process(params: BatchParams):
             plot_topography(img, title=f, save=sample_out / "topography-raw.png")
             plot_topography(img, title=f, save=sample_out / "topography-outliers_correction.png",
                             correct_outliers_on=True, correct_shading_on=False)
-            plot_topography(img, title=f, save=sample_out / "topographyv-outliersAndShading_correction.png",
+            plot_topography(img, title=f, save=sample_out / "topography-outliersAndShading_correction.png",
                             correct_outliers_on=True, correct_shading_on=True)
 
         # 2.2 Bandas
@@ -202,16 +167,15 @@ def batch_process(params: BatchParams):
 
         # 2.3 RGB multiband
         if params.do_multiband and params.bands and len(params.bands) >= 3:
-            _plot_multiband_rgb(
+            plot_multiband(
                 img,
                 bands=params.bands,
-                idx_rgb=params.multiband_idx,
-                out=sample_out / "multiband_RGB.png"
+                save=sample_out / 'multibands.png'
             )
 
         # 2.4 k-means
         if params.do_kmeans:
-            _plot_kmeans(img, params.n_clusters, sample_out / "kmeans.png")
+            plot_kmeans(img, n_clusters=params.n_clusters, save=sample_out / "kmeans.png")
 
         # 2.5 PCA
         if params.do_pca:

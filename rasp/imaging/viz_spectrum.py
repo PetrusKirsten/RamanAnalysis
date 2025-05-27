@@ -33,10 +33,10 @@ def plot_mean_spectrum(image, title="Mean Spectrum of Map", save=None):
     sorted_peaks = peaks[np.argsort(var_spectrum[peaks])[::-1]][:n_peaks]
 
     # figure and plots configs
-    ax1 = config_figure(fig_title='', size=(2*1920, 2*1080),
+    ax1 = config_figure(fig_title='', size=(1.5*1920, 1.5*1080),
                         face="#FFFFFF", edge="#383838",)
     ax1.set_aspect('auto')
-    ax1.set_xlabel("Raman Shift (cm$^{-1}$)")
+    ax1.set_xlabel("Raman Shift (cm$^{-1}$)"); ax1.set_xlim((np.min(shifts), np.max(shifts)))
     ax1.tick_params(axis='x', colors='#383838', direction='out', length=4, width=.75, pad=4)
 
     color1 = "darkorange"
@@ -58,11 +58,11 @@ def plot_mean_spectrum(image, title="Mean Spectrum of Map", save=None):
         shift = shifts[p]
         var_value = var_spectrum[p]
 
-        ax2.scatter(shift, var_value, color=color2, s=40, zorder=5)
+        ax2.scatter(shift, var_value, color=color2, s=25, zorder=5)
         ax2.annotate(
             f"{int(shift)}" + " cm$^{-1}$", fontsize=9,
             xy=(shift, var_value), xytext=(0, 10), textcoords="offset points", ha="center",
-            bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=color2, lw=0.8)
+            bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=color2, lw=0.5)
         )
     
     if save:
