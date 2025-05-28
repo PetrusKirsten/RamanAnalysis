@@ -1,11 +1,14 @@
 import numpy as np
 import ramanspy as rp
 import matplotlib.pyplot as plt
+
 from pathlib import Path
 from matplotlib import cm
 from scipy.ndimage import gaussian_filter
 from sklearn.cluster import KMeans
-from _config import config_figure, scale_ticks
+
+from _config        import config_figure, scale_ticks
+from preprocess_map import correct_shading
 
 def plot_kmeans(img: rp.SpectralImage,
                      n_clusters: int = 3,
@@ -34,9 +37,10 @@ def plot_kmeans(img: rp.SpectralImage,
 
     spectral_data = img.spectral_data.copy()
     if shading:
-        topo = np.sum(spectral_data, axis=-1)
-        shading_map = gaussian_filter(topo, sigma=sigma) + 1e-12
-        spectral_data = spectral_data / shading_map[..., None]  # corrige cada pixel espectralmente
+        spectral_data = correct_shading(spectral_data)
+        # topo = np.sum(spectral_data, axis=-1)
+        # shading_map = gaussian_filter(topo, sigma=sigma) + 1e-12
+        # spectral_data = spectral_data / shading_map[..., None]  # corrige cada pixel espectralmente
 
     spec_mat = spectral_data.reshape(-1, spectral_data.shape[-1])
 

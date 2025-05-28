@@ -169,8 +169,9 @@ def batch_process(params: BatchParams):
         if params.do_multiband and params.bands and len(params.bands) >= 3:
             plot_multiband(
                 img,
-                bands=params.bands,
-                save=sample_out / 'multibands.png'
+                bands       =   params.bands,
+                save        =   sample_out / 'multibands.png',
+                thresholds  =   (0.5 ,0.5, 1.1)
             )
 
         # 2.4 k-means

@@ -11,8 +11,7 @@ from viz_band       import extract_band
 
 
 def apply_alpha_mask(rgb: np.ndarray,
-                                 channel_thresholds: tuple[float, float, float]
-                                ) -> np.ndarray:
+                     channel_thresholds: tuple[float, float, float]) -> np.ndarray:
     """
     Dada uma imagem RGB (h×w×3) e thresholds por canal,
     zera (torna invisível) os canais cujos valores estão abaixo do threshold,
@@ -127,6 +126,7 @@ def plot_multiband_rgb(
 def plot_multiband(
         image:      rp.SpectralImage,
         bands:      list,
+        thresholds: tuple = (0.1, 0.5, 1.1),
         colors:     list = None,
         shading:    bool = True,
         save = None
@@ -154,10 +154,12 @@ def plot_multiband(
 
     chan = [extract_band(image, c, w) for c, w, _ in bands]
     if shading:
-        from viz_topo import get_sum
-        topo = get_sum(image)
-        shading_map = gaussian_filter(topo, sigma=7.0) + 1e-12
-        chan = [b / shading_map for b in chan]
+        from preprocess_map import correct_shading
+        
+        chan = [correct_shading(b) for b in chan]
+        # topo = get_sum(image)
+        # shading_map = gaussian_filter(topo, sigma=7.0) + 1e-12
+        # chan = [b / shading_map for b in chan]
     chan = [stretch(b) for b in chan]
 
     # region
@@ -179,7 +181,6 @@ def plot_multiband(
         rgb[...,2] += band_img * cb
 
     rgb = np.clip(rgb, 0, 1)
-    thresholds = (0.1, 0.5, 1.1)
     rgba = apply_alpha_mask(rgb, thresholds)
 
     ax = config_figure(f"RGB Bands {bands}", size=(2000, 2000))
