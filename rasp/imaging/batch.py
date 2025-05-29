@@ -200,7 +200,7 @@ if __name__ == "__main__":
     for sample in [' ', ' kC ', ' iC ']:
         params = BatchParams(
             input_folder  = f"./data/St{sample}CLs",
-            output_folder = f"./figures/maps-St_{sample}",
+            output_folder = f"./figures/maps-St {sample}CLs",
             bands=[
                 (851, 5, "851"),
                 (939, 10, "939"), 
@@ -208,4 +208,4 @@ if __name__ == "__main__":
             ],
             n_clusters=3)
     
-    batch_process(params)
+        batch_process(params)
