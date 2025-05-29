@@ -1,9 +1,11 @@
 import ramanspy as rp
 
 def preprocess(spectrum: rp.Spectrum,
-               crop_range: tuple = (40, 1785),
-               smooth_window: int = 7,
-               smooth_polyorder: int = 2) -> rp.Spectrum:
+               crop_range       : tuple = (40, 1785),
+               smooth_window    : int   = 7,
+               smooth_polyorder : int   = 2,
+               despike_kernel   : int   = 8,
+               despike_threshold: int   = 15) -> rp.Spectrum:
     """
     Apply full preprocessing pipeline to a RamanSPy Spectrum.
 
@@ -26,7 +28,7 @@ def preprocess(spectrum: rp.Spectrum,
 
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=crop_range),
-        rp.preprocessing.despike.WhitakerHayes(kernel_size=8, threshold=15),
+        rp.preprocessing.despike.WhitakerHayes(kernel_size=despike_kernel, threshold=despike_threshold),
         # rp.preprocessing.despike.WhitakerHayes(kernel_size=3, threshold=15),
         rp.preprocessing.denoise.SavGol(window_length=smooth_window, polyorder=smooth_polyorder),
         rp.preprocessing.baseline.ASLS(),
