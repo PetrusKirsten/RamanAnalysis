@@ -22,7 +22,7 @@ from _config         import set_font, config_figure, normalize
 from viz_topo        import plot_topography
 from viz_band        import plot_band
 from viz_spectrum    import plot_mean_spectrum
-from viz_multiband   import plot_multiband, plot_multiband_rgb
+from viz_multiband   import plot_multiband
 from viz_kmeans      import plot_kmeans
 
 
@@ -33,13 +33,12 @@ BandTuple = Tuple[int, int, str]   # (center, width, label)
 class BatchParams:
     input_folder   : str
     output_folder  : str
-    region         : Tuple[int, int] = (280, 1780)
-    win_len        : int = 21
+    region         : Tuple[int, int] = (315, 1780)
 
     # ─ mapas a gerar ─────────────────
     do_spectra     : bool = True
     do_topography  : bool = False
-    do_bands       : bool = False
+    do_bands       : bool = True
     do_multiband   : bool = True
     do_kmeans      : bool = False
     do_pca         : bool = False
@@ -49,7 +48,7 @@ class BatchParams:
 
     # multiband RGB: passa índices (0, 1, 2) referindo-se a self.bands
     mb_idx        : Tuple[int, int, int]       = (0, 1, 2)
-    mb_thresholds : Tuple[float, float, float] = (0.7, 1.1, 0.5)
+    mb_thresholds : Tuple[float, float, float] = (0.65, 1.1, 0.45)
 
     # k-means / PCA
     n_clusters     : int = 2
@@ -117,7 +116,7 @@ def batch_process(params: BatchParams):
     # 2) Preprocess all maps at once
     maps_pp = []
     for m in tqdm(raw_maps, desc="Preprocessing maps", unit="maps"):
-        maps_pp.append(preprocess_maps([m], region=params.region, win_len=params.win_len)[0])
+        maps_pp.append(preprocess_maps([m], region=params.region)[0])
 
     # |-|-| Log global
     run_ts  = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -155,11 +154,7 @@ def batch_process(params: BatchParams):
                           center = center,
                           width  = width,
                           save   = sample_out / f'band_{label}-raw.png')
-                plot_band(img,
-                          center = center,
-                          width  = width,
-                          save   = sample_out / f'band_{label}-outliers_correction.png',
-                          correct_outliers_on=True, correct_shading_on=False)
+                
                 plot_band(img,
                           center = center,
                           width  = width,
@@ -202,10 +197,15 @@ if __name__ == "__main__":
 
     set_font("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")
 
-    params = BatchParams(
-        input_folder  ="./data/St kC CLs",
-        output_folder ="./figures/maps-St_kC",
-        bands=[(851, 2, "851"), (939, 10, "939"), (478, 20, "478")],
-        n_clusters=3)
+    for sample in [' ', ' kC ', ' iC ']:
+        params = BatchParams(
+            input_folder  = f"./data/St{sample}CLs",
+            output_folder = f"./figures/maps-St_{sample}",
+            bands=[
+                (851, 5, "851"),
+                (939, 10, "939"), 
+                (478, 20, "478")
+            ],
+            n_clusters=3)
     
     batch_process(params)

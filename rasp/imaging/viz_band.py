@@ -25,7 +25,7 @@ def plot_band(img, center, width, title=None, save=None,
     if correct_shading_on:
         band = correct_shading(band, sigma=7.0)
 
-    im = ax.imshow(band, cmap='magma')
+    im = ax.imshow(band, cmap='magma', interpolation='bilinear')
     cbar = plt.colorbar(im, ax=ax, fraction=0.04, pad=0.04)
     config_bar(cbar)
     scale_ticks(ax)

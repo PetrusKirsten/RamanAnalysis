@@ -227,7 +227,7 @@ def plot_multiband(
     ax = config_figure(
         f"Bands: Red: {bands[0][0]}" + " cm$^{-1}$ " + f"Blue: {bands[-1][0]}" + " cm$^{-1}$",
         size=(2000, 2000))
-    ax.imshow(rgba, origin='upper', interpolation='gaussian')
+    ax.imshow(rgba, origin='upper', interpolation='bilinear')
     scale_ticks(ax)
     plt.tight_layout()
 

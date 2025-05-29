@@ -103,8 +103,8 @@ def config_bar(colorbar) -> None:
 
 def config_figure(fig_title: str,
                   size: tuple,
-                  face: str = '#FFFFFF',  # #09141E
-                  edge: str = "#383838") -> plt.Axes:
+                  face: str = '#09141E',  # #09141E
+                  edge: str = "#09141E") -> plt.Axes:
     
     """
     Create a styled Matplotlib Axes with specified background and edge colors.
@@ -127,8 +127,8 @@ def config_figure(fig_title: str,
     fig, ax = plt.subplots(figsize=(w, h), facecolor=face)
     ax.set_facecolor(face)
 
-    ax.set_title(fig_title, color='#383838', weight='bold', pad=12)
-    ax.tick_params(colors='#383838', direction='out', length=0, width=0, pad=4)
+    ax.set_title(fig_title, color='#FFFFFF', weight='bold', pad=12)
+    ax.tick_params(colors='#FFFFFF', direction='out', length=0, width=0, pad=4)
     ax.set_aspect('equal')
     ax.grid(False)  # remover grades de fundo, se usar 'whitegrid' pode manter leves
     for spine in ax.spines.values():
