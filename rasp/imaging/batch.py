@@ -37,7 +37,7 @@ class BatchParams:
 
     # ─ mapas a gerar ─────────────────
     do_spectra     : bool = True
-    do_topography  : bool = False
+    do_topography  : bool = True
     do_bands       : bool = True
     do_multiband   : bool = True
     do_kmeans      : bool = False
@@ -48,7 +48,7 @@ class BatchParams:
 
     # multiband RGB: passa índices (0, 1, 2) referindo-se a self.bands
     mb_idx        : Tuple[int, int, int]       = (0, 1, 2)
-    mb_thresholds : Tuple[float, float, float] = (0.90, 1.1, 0.45)
+    mb_thresholds : Tuple[float, float, float] = (0.75, 1.1, 0.45)
 
     # k-means / PCA
     n_clusters     : int = 2
@@ -197,8 +197,8 @@ if __name__ == "__main__":
 
     set_font("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")
 
-    for sample in [' ',]:
-    # for sample in [' ', ' kC ', ' iC ']:
+    # for sample in [' ',]:
+    for sample in [' ', ' kC ', ' iC ']:
         params = BatchParams(
             input_folder  = f"./data/St{sample}CLs",
             output_folder = f"./figures/maps-St {sample}CLs",
