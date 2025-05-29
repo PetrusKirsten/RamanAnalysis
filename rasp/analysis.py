@@ -1,11 +1,13 @@
-import re
+import re, os
 import numpy as np
 import pandas as pd
 import ramanspy as rp
 import matplotlib.pyplot as plt
 
+from lmfit.models import VoigtModel
 from typing import List, Dict, Tuple
 from scipy.signal import find_peaks, peak_prominences, peak_widths
+
 
 
 def get_peaks(spectrum: rp.Spectrum,
@@ -362,3 +364,148 @@ def plot_all_metrics(
         plt.savefig(f"{out_folder}/all_band_metrics.png", dpi=300)
     
     # plt.show()
+
+
+def deconvolve_batch(spectra, labels, region, n_peaks,
+                     save_figs=True, fig_folder="./figures/deconv",
+                     save_csv=True, csv_path="./figures/deconv/metrics.csv"):
+    """
+    Aplica deconvolução a uma lista de espectros e salva resultados.
+
+    Parâmetros:
+    - spectra: lista de objetos Spectrum
+    - labels: lista de labels (grupo, conc) correspondentes
+    - region: tupla (min, max) com a região a analisar
+    - n_peaks: número de picos a ajustar
+    - save_figs: salva os gráficos se True
+    - fig_folder: onde salvar as figuras
+    - save_csv: salva o CSV com métricas se True
+    - csv_path: caminho para o arquivo CSV de saída
+
+    Retorna:
+    - df_result: DataFrame com todas as métricas
+    """
+    
+    def deconvolve_band(spectrum):
+        """
+        Deconvolui uma banda Raman em uma região definida usando modelos Voigt.
+
+        Parâmetros:
+        - spectrum: objeto Spectrum do RASP
+        - region: tupla (min, max) com limites da banda (em cm⁻¹)
+        - n_peaks: número de picos a ajustar
+        - plot: se True, plota resultado com os picos
+
+        Retorna:
+        - DataFrame com parâmetros de cada pico (centro, FWHM, área, amplitude)
+        """
+
+        # 1️⃣ Recortar região de interesse
+        x = spectrum.spectral_axis
+        y = spectrum.spectral_data
+        mask = (x >= region[0]) & (x <= region[1])
+        x_region = x[mask]
+        y_region = y[mask]
+
+        # 2️⃣ Construir modelo composto
+        model = None
+        params = None
+        for i in range(n_peaks):
+            prefix = f"p{i}_"
+            peak = VoigtModel(prefix=prefix)
+            center_guess = np.linspace(region[0], region[1], n_peaks)[i]
+            amp_guess = max(y_region)
+
+            if model is None:
+                model = peak
+            else:
+                model += peak
+
+            p = peak.make_params(
+                center=center_guess,
+                amplitude=amp_guess,
+                sigma=5,
+                gamma=1,
+            )
+
+            if params is None:
+                params = p
+            else:
+                params.update(p)
+
+        # 3️⃣ Ajustar modelo
+        result = model.fit(y_region, params, x=x_region)
+
+        # 4️⃣ Plot
+        from rasp.plot_utils import config_figure
+
+        ax = config_figure(fig_title=f"Deconvolution in {region[0]} – {region[1]}"+" cm$^{-1}$",
+                            size=(2000, 2000))
+        
+        ax.plot(x_region, y_region, 'k-', label='Original')
+        ax.plot(x_region, result.best_fit, 'r--', label='Fit total')
+        comps = result.eval_components(x=x_region)
+        for i in range(n_peaks):
+            ax.plot(x_region, comps[f"p{i}_"], '--', label=f'Peak {i+1}')
+
+        ax.set_xlabel("Raman shift (cm$^{-1}$)")
+        ax.set_ylabel("Intensity")
+        
+        ax.legend()
+        plt.tight_layout()
+
+        # Salvar figura se ativado
+        if save_figs:
+            fig_name = f"{label_str}_{region[0]}-{region[1]}cm.png"
+            fig_path = os.path.join(fig_folder, fig_name)
+            plt.savefig(fig_path, dpi=300)
+            plt.close()
+
+        # 5️⃣ Resultados: extrair métricas
+        rows = []
+        for i in range(n_peaks):
+            pref = f"p{i}_"
+            amp = result.params[pref + 'amplitude'].value
+            cen = result.params[pref + 'center'].value
+            sig = result.params[pref + 'sigma'].value
+            gam = result.params[pref + 'gamma'].value
+            fwhm = 0.5346 * 2 * gam + np.sqrt(0.2166 * (2 * gam)**2 + (2.3548 * sig)**2)
+            area = amp  # área aproximada no Voigt pode ser refinada, mas serve assim
+            rows.append({
+                "peak"      : i+1,
+                "center"    : cen,
+                "amplitude" : amp,
+                "FWHM"      : fwhm,
+                "area"      : area
+            })
+
+        df = pd.DataFrame(rows)
+        df["region"]    = f"{region[0]}–{region[1]}"
+        df["n_peaks"]   = n_peaks
+        df["r_squared"] = result.rsquared if hasattr(result, "rsquared") else np.nan
+
+        return df
+    
+    os.makedirs(fig_folder, exist_ok=True)
+    all_results = []
+
+    for spectrum, label in zip(spectra, labels):
+        group, conc = label
+        label_str = f"{group}_{conc}mM".replace(" ", "_")
+
+        # Ajustar e plotar
+        df = deconvolve_band(spectrum)
+
+        # Adicionar info de amostra
+        df["sample"] = label_str
+
+        all_results.append(df)
+
+    df_result = pd.concat(all_results, ignore_index=True)
+
+    if save_csv:
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+        df_result.to_csv(csv_path, index=False)
+        print(f"✅ Resultados salvos em: {csv_path}")
+
+    return df_result

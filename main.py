@@ -3,15 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-from rasp.loaders import load_spectrum
-from rasp.utils import combine_spectra
+from rasp.loaders       import load_spectrum
+from rasp.utils         import combine_spectra
 from rasp.preprocessing import preprocess_batch
-from rasp.plot_utils import set_font, plot_stacked, config_figure
-from rasp.multivariate import compute_pca, plot_pca, plot_pca_scree, plot_pca_loadings
-from rasp.multivariate import plot_heatmap, plot_pca_scores
-from rasp.analysis import extract_band_areas, plot_band_by_formulation, plot_all_bands
-from rasp.analysis import extract_band_metrics, compute_ratio, plot_band_metric
-
+from rasp.plot_utils    import set_font, plot_stacked, config_figure
+from rasp.multivariate  import compute_pca, plot_pca, plot_pca_scree, plot_pca_loadings
+from rasp.analysis      import extract_band_areas, plot_band_by_formulation, plot_all_bands
+from rasp.analysis      import extract_band_metrics, plot_band_metric
+from rasp.analysis      import deconvolve_batch
 
 def run_pca(data_folder="./data"):
 
@@ -388,6 +387,15 @@ if __name__ == "__main__":
 
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
     spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
+
+    df = deconvolve_batch(
+            spectra     = spec,
+            labels      = lbls,
+            region      = (820, 885),
+            n_peaks     = 2,
+            fig_folder  = "./figures/deconv/800_900",
+            csv_path    = "./figures/deconv/800_900/metrics.csv")
+
     # run_bands_metric(spec, lbls, bands)
     # run_bands_analysis(spec, lbls, bands)
     # run_pca()

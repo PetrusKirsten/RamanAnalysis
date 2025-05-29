@@ -241,6 +241,7 @@ def plot_stacked(spectra        : list,
             safe = title.lower().replace(" ", "_")
             filename = f"{safe}.png"
         plt.savefig(os.path.join(out_folder, filename), dpi=300)
+        plt.close()
 
 
 def plot_area(
