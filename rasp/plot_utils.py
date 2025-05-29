@@ -157,10 +157,19 @@ def plot_spectrum(
         plt.savefig(save_path, dpi=300)
 
 
-def plot_stacked(spectra: list, labels: list = None, title: str = "Stacked Raman Spectra", colors: list = [],
-                 size: tuple = (4500, 2000), linewidth: float = 1., transp: float = 0.75, offset_step: float = 1,
-                 highlight_peaks: bool = True, peak_prominence: float = 0.05,
-                 save: bool = True, out_folder: str = "", filename: str = "",):
+def plot_stacked(spectra        : list, 
+                 labels         : list  = None, 
+                 title          : str   = "Stacked Raman Spectra", 
+                 colors         : list  = [],
+                 size           : tuple = (4500, 2000), 
+                 linewidth      : float = 1.75, 
+                 transp         : float = 0.75, 
+                 offset_step    : float = 1,
+                 highlight_peaks: bool  = True, 
+                 peak_prominence: float = 0.05,
+                 save           : bool  = True, 
+                 out_folder     : str   = "", 
+                 filename       : str   = "",):
 
     """
     Plot stacked Raman spectra with vertical offset.
@@ -187,10 +196,13 @@ def plot_stacked(spectra: list, labels: list = None, title: str = "Stacked Raman
 
     ax = config_figure(title, size)
 
-    ax.set_xlabel("Raman Shift (cm$^{-1}$)"); ax.set_ylabel("Intensity"); ax.set_yticklabels([]); ax.set_yticks([])
+    ax.set_xlabel("Raman Shift (cm$^{-1}$)")
+    ax.set_ylabel("Intensity"); ax.set_yticklabels([]); ax.set_yticks([])
+    
     start, stop, step = 300, 1800, 100
     locs = np.arange(start, stop + step, step)
     ax.xaxis.set_major_locator(FixedLocator(locs)); ax.xaxis.set_minor_locator(MultipleLocator(20))
+    
     ax.tick_params(which='major', length=6); ax.tick_params(which='minor', length=3)
 
     for i, spectrum in enumerate(spectra):
@@ -204,7 +216,7 @@ def plot_stacked(spectra: list, labels: list = None, title: str = "Stacked Raman
 
         ax.plot(x, y + offset, lw=linewidth, label=label, color=colors[i], alpha=transp, zorder=1)
 
-        if highlight_peaks:
+        if highlight_peaks and offset_step > 0:
             peak_pos, peak_int = get_peaks(spectrum, prominence=peak_prominence)
 
             ax.plot(peak_pos, peak_int + offset, lw=0,

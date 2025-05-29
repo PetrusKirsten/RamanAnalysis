@@ -158,7 +158,6 @@ def run_spectra(data_folder="./data",
     by_group = defaultdict(list)
     for sp, (grp, conc) in zip(spectra_final, labels_final):
         by_group[grp].append((float(conc), sp))
-
     colors = {
         "St": ['#E1C96B', '#FFE138', '#F1A836', '#E36E34'],
         "St kC": ['hotpink', 'mediumvioletred', '#A251C3', '#773AD1'],
@@ -171,16 +170,18 @@ def run_spectra(data_folder="./data",
         title = f"{grp}"
 
         plot_stacked(
-            spectra=list(specs), labels=labels, title=title, colors=colors[grp],
-            save=save, out_folder=out_folder, filename=f"spectra_{grp.replace(' ', '_')}.png"
+            spectra=list(specs), labels=labels, title=title, colors=colors[grp], offset_step=0,
+            save=save, out_folder=out_folder, filename=f"spectra_{grp.replace(' ', '_')}_sob.png"
         )
-    # plt.show()
+        plot_stacked(
+            spectra=list(specs), labels=labels, title=title, colors=colors[grp], offset_step=1,
+            save=save, out_folder=out_folder, filename=f"spectra_{grp.replace(' ', '_')}_stacked.png"
+        )
     
     # 5️⃣ Plot por concentração de Ca²⁺
     by_conc = defaultdict(list)
     for sp, (grp, conc) in zip(spectra_final, labels_final):
         by_conc[conc].append((grp, sp))
-
     for conc, lst in by_conc.items():
         lst_sorted = sorted(lst, key=lambda x: x[0])
         grps, specs = zip(*lst_sorted)
@@ -188,10 +189,13 @@ def run_spectra(data_folder="./data",
 
         colors_conc = [colors[grps[0]][2], colors[grps[1]][1], colors[grps[2]][1]]
         plot_stacked(
-            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc,
-            save=save, out_folder=out_folder, filename=f"spectra_{int(float(conc))}mM.png"
+            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc, offset_step=1,
+            save=save, out_folder=out_folder, filename=f"spectra_{int(float(conc))}mM_stacked.png"
         )
-    # plt.show()
+        plot_stacked(
+            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc, offset_step=0,
+            save=save, out_folder=out_folder, filename=f"spectra_{int(float(conc))}mM_sob.png"
+        )
 
     return spectra_final, labels_final
 
@@ -295,16 +299,7 @@ def run_spectra_precursors(
     return spectra_final, labels_final
 
 
-def run_bands(spectra, labels):
-
-    # 1) defina suas bandas
-    bands = {
-        "C–O–C 480": (470, 490),
-        "Ring 942":  (932, 952),
-        "OSO3 845":  (835, 855),
-        "OSO3 1240": (1230, 1250),
-        "C–O 1080":  (1070, 1090),
-    }
+def run_bands(spectra, labels, bands):
 
     # 2) extraia áreas
     df_areas = extract_band_areas(
@@ -331,17 +326,7 @@ def run_bands(spectra, labels):
     )
 
 
-def run_bands_metric(spectra, labels):
-
-    bands = {  
-        # TODO: justify each band
-        #"478":   (478 - 10,  478 + 10),
-        #"851":   (851 - 5,   851 + 5),
-        #"862":   (862 - 25,  862 + 15),
-        #"939":   (939 - 15,  939 + 15),
-        "1080":  (1080 - 20, 1080 + 20),
-        #"1650":  (1650 - 40, 1650 + 40),
-    }
+def run_bands_metric(spectra, labels, bands):
 
     df_metrics = extract_band_metrics(spectra, labels, bands)
     #df_metrics = compute_ratio(df_metrics, "851", "939")
@@ -354,7 +339,7 @@ def run_bands_metric(spectra, labels):
         # plot_band_metric(df_metrics, f"FWHM at {band} 1/cm", "Area", out_folder="figures/bands", save=True)
 
 
-def run_bands_analysis(spectra, labels):
+def run_bands_analysis(spectra, labels, bands):
     # 1️⃣ Definir bandas
     bands = {
         "478":   (468, 488),
@@ -391,11 +376,18 @@ def run_bands_analysis(spectra, labels):
 
 if __name__ == "__main__":
     
-    font_path = ("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")   
-    set_font(font_path)
+    set_font("D:/Documents/GitHub/Raman-Analysis-Software/data/fonts/Helvetica-Light.ttf")
 
-    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
+    bands = {
+        "478"  :  (470,  490),
+        "851"  :  (932,  952),
+        "845"  :  (835,  855),
+        "1240" :  (1230, 1250),
+        "1080" :  (1070, 1090),
+    }
+
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
-    #run_bands_metric(spec, lbls)'
-    run_bands_analysis(spec, lbls)
+    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
+    # run_bands_metric(spec, lbls, bands)
+    # run_bands_analysis(spec, lbls, bands)
     # run_pca()

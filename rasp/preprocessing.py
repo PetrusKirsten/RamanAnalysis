@@ -1,10 +1,10 @@
 import ramanspy as rp
 
 def preprocess(spectrum: rp.Spectrum,
-               crop_range       : tuple = (40, 1785),
-               smooth_window    : int   = 7,
-               smooth_polyorder : int   = 2,
-               despike_kernel   : int   = 8,
+               crop_range       : tuple = (315, 1785),
+               smooth_window    : int   = 13,
+               smooth_polyorder : int   = 3,
+               despike_kernel   : int   = 3,
                despike_threshold: int   = 15) -> rp.Spectrum:
     """
     Apply full preprocessing pipeline to a RamanSPy Spectrum.
@@ -29,7 +29,6 @@ def preprocess(spectrum: rp.Spectrum,
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=crop_range),
         rp.preprocessing.despike.WhitakerHayes(kernel_size=despike_kernel, threshold=despike_threshold),
-        # rp.preprocessing.despike.WhitakerHayes(kernel_size=3, threshold=15),
         rp.preprocessing.denoise.SavGol(window_length=smooth_window, polyorder=smooth_polyorder),
         rp.preprocessing.baseline.ASLS(),
     ])
@@ -38,9 +37,11 @@ def preprocess(spectrum: rp.Spectrum,
 
 
 def preprocess_batch(spectra_list,
-                     crop_range=(380, 1780),
-                     smooth_window=7,
-                     smooth_polyorder=2):
+               crop_range       : tuple = (315, 1785),
+               smooth_window    : int   = 13,
+               smooth_polyorder : int   = 3,
+               despike_kernel   : int   = 3,
+               despike_threshold: int   = 15):
     """
     Apply the same preprocessing pipeline to a batch of spectra.
 
@@ -57,7 +58,7 @@ def preprocess_batch(spectra_list,
     """
     routine = rp.preprocessing.Pipeline([
         rp.preprocessing.misc.Cropper(region=crop_range),
-        rp.preprocessing.despike.WhitakerHayes(kernel_size=8, threshold=15),
+        rp.preprocessing.despike.WhitakerHayes(kernel_size=despike_kernel, threshold=despike_threshold),
         rp.preprocessing.denoise.SavGol(window_length=smooth_window, polyorder=smooth_polyorder),
         rp.preprocessing.baseline.ASLS(),
         rp.preprocessing.normalise.MinMax(),
