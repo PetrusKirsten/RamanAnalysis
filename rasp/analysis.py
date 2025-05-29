@@ -441,9 +441,9 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
 
         ax = config_figure(fig_title=f"Deconvolution in {region[0]} – {region[1]}"+" cm$^{-1}$",
                             size=(2000, 2000))
-        
+        # TODO: probably a problem of underfittin => try to use a larger region to deconvolute 
         ax.plot(x_region, y_region, 'k-', label='Original')
-        ax.plot(x_region, result.best_fit, 'r--', label='Fit total')
+        ax.plot(x_region, result.best_fit, 'r--', label='Total fit')
         comps = result.eval_components(x=x_region)
         for i in range(n_peaks):
             ax.plot(x_region, comps[f"p{i}_"], '--', label=f'Peak {i+1}')
