@@ -34,24 +34,25 @@ class BatchParams:
     input_folder   : str
     output_folder  : str
     region         : Tuple[int, int] = (280, 1780)
-    win_len        : int = 7
+    win_len        : int = 21
 
     # ─ mapas a gerar ─────────────────
     do_spectra     : bool = True
     do_topography  : bool = False
     do_bands       : bool = False
     do_multiband   : bool = True
-    do_kmeans      : bool = True
+    do_kmeans      : bool = False
     do_pca         : bool = False
 
     # opções band-map
     bands          : List[BandTuple] | None = None
 
-    # multiband RGB: passa índices (0,1,2) referindo-se a self.bands
-    multiband_idx  : Tuple[int, int, int] = (0, 1, 2)
+    # multiband RGB: passa índices (0, 1, 2) referindo-se a self.bands
+    mb_idx        : Tuple[int, int, int]       = (0, 1, 2)
+    mb_thresholds : Tuple[float, float, float] = (0.7, 1.1, 0.5)
 
     # k-means / PCA
-    n_clusters     : int = 4
+    n_clusters     : int = 2
     pca_components : int = 3
 
 
@@ -167,11 +168,24 @@ def batch_process(params: BatchParams):
 
         # 2.3 RGB multiband
         if params.do_multiband and params.bands and len(params.bands) >= 3:
+            mode = 'continuous'
             plot_multiband(
                 img,
-                bands       =   params.bands,
-                save        =   sample_out / 'multibands.png',
-                thresholds  =   (0.5 ,0.5, 1.1)
+                bands       = params.bands,
+                save        = sample_out / f'multibands_global_{mode}.png',
+                thresholds  = params.mb_thresholds,
+                normalize   = 'global',
+                mode=mode
+            )
+
+            mode = 'binary'
+            plot_multiband(
+                img,
+                bands       = params.bands,
+                save        = sample_out / f'multibands_global_{mode}.png',
+                thresholds  = params.mb_thresholds,
+                normalize   = 'global',
+                mode=mode
             )
 
         # 2.4 k-means
@@ -191,7 +205,7 @@ if __name__ == "__main__":
     params = BatchParams(
         input_folder  ="./data/St kC CLs",
         output_folder ="./figures/maps-St_kC",
-        bands=[(851, 5, "851"), (939, 10, "939"), (1650, 30, "1650")],
+        bands=[(851, 2, "851"), (939, 10, "939"), (478, 20, "478")],
         n_clusters=3)
     
     batch_process(params)

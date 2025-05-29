@@ -2,9 +2,9 @@
 import numpy as np
 import ramanspy as rp
 import matplotlib.pyplot as plt
+
 from scipy.ndimage import gaussian_filter
 
-from preprocess_map import correct_outliers, correct_shading
 from _config        import config_figure, scale_ticks
 from viz_topo       import get_sum
 from viz_band       import extract_band
@@ -126,10 +126,12 @@ def plot_multiband_rgb(
 def plot_multiband(
         image:      rp.SpectralImage,
         bands:      list,
+        colors:     list  = None,
+        normalize:  str   = 'local',
+        mode:       str   = 'continuous',
         thresholds: tuple = (0.1, 0.5, 1.1),
-        colors:     list = None,
-        shading:    bool = True,
-        save = None
+        shading:    bool  = True,
+        save              = None
     ) -> None:
     """
     Combine multiple single-band maps into a false-color RGB image.
@@ -149,18 +151,54 @@ def plot_multiband(
     """
 
     def stretch(arr):
-        p1, p99 = np.percentile(arr, (2, 98))
-        return np.clip((arr - p1) / (p99 - p1 + 1e-12), 0, 1)
+        """
+        Stretch por percentil 2–98.
+        
+        Parameters
+        ----------
+        arr : np.ndarray ou list[np.ndarray]
+            Array único (modo 'local') ou lista de arrays (modo 'global').
+        mode : str
+            'local' → normaliza cada banda individualmente.
+            'global' → normaliza todas as bandas juntas no mesmo intervalo.
 
+        Returns
+        -------
+        Array normalizado (ou lista de arrays normalizados no modo global).
+        """
+
+        if normalize == 'local':
+            stretched = np.empty_like(arr)
+            for i in range(arr.shape[-1]):
+                p1, p99 = np.percentile(arr[..., i], (2, 98))
+                stretched[..., i] = np.clip((arr[..., i] - p1) / (p99 - p1 + 1e-12), 0, 1)
+
+        elif normalize == 'global':
+            p1, p99 = np.percentile(arr, (2, 98))
+            stretched = np.clip((arr - p1) / (p99 - p1 + 1e-12), 0, 1)
+
+        else:
+            raise ValueError("mode must be 'local' or 'global'")
+
+        return stretched  # Sempre retorna array shape (h, w, n_bandas)
+        
     chan = [extract_band(image, c, w) for c, w, _ in bands]
+
     if shading:
         from preprocess_map import correct_shading
-        
         chan = [correct_shading(b) for b in chan]
+        # region
         # topo = get_sum(image)
         # shading_map = gaussian_filter(topo, sigma=7.0) + 1e-12
         # chan = [b / shading_map for b in chan]
+        # endregion
+    
+    chan[0] = chan[0] / chan[2]  # ratio of 851 cm-1 band to 478 cm-1
     chan = [stretch(b) for b in chan]
+    
+    if mode == 'binary':
+        for i in range(len(chan)):
+            chan[i] = (chan[i] >= thresholds[i]).astype(float)
 
     # region
     # if compensation == 'diff':
@@ -176,15 +214,20 @@ def plot_multiband(
 
     for i, band_img in enumerate(chan):
         cr, cg, cb = colors[i]
-        rgb[...,0] += band_img * cr
-        rgb[...,1] += band_img * cg
-        rgb[...,2] += band_img * cb
+        rgb[..., 0] += band_img * cr
+        rgb[..., 1] += band_img * cg
+        rgb[..., 2] += band_img * cb
 
     rgb = np.clip(rgb, 0, 1)
     rgba = apply_alpha_mask(rgb, thresholds)
 
-    ax = config_figure(f"RGB Bands {bands}", size=(2000, 2000))
-    ax.imshow(rgba, origin='upper', interpolation='nearest')
+    # composition plot
+    plot_composition_pie(rgb=rgba, thresholds=thresholds, strategy='binary', save=save)
+
+    ax = config_figure(
+        f"Bands: Red: {bands[0][0]}" + " cm$^{-1}$ " + f"Blue: {bands[-1][0]}" + " cm$^{-1}$",
+        size=(2000, 2000))
+    ax.imshow(rgba, origin='upper', interpolation='gaussian')
     scale_ticks(ax)
     plt.tight_layout()
 
@@ -192,3 +235,152 @@ def plot_multiband(
         plt.savefig(save, dpi=300)
         plt.close()
 
+
+def plot_composition_pie(rgb, thresholds=(0.2, 0.2, 0.2), strategy='binary', save=None):
+    """
+    Gera gráfico de pizza com base na composição dos canais RGB.
+
+    Parameters
+    ----------
+    rgb : np.ndarray (h, w, 3)
+        Imagem RGB normalizada entre 0 e 1.
+    thresholds : tuple
+        Thresholds por canal (R, G, B).
+    strategy : str
+        'binary' para presença/ausência por pixel, ou
+        'intensity' para soma contínua dos valores dos canais.
+    """
+
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+
+    if strategy == 'binary':
+        r_mask = (r >= thresholds[0]).astype(int)
+        g_mask = (g >= thresholds[1]).astype(int)
+        b_mask = (b >= thresholds[2]).astype(int)
+
+        only_r = (r_mask == 1) & (g_mask == 0) & (b_mask == 0)
+        only_g = (g_mask == 1) & (r_mask == 0) & (b_mask == 0)
+        only_b = (b_mask == 1) & (r_mask == 0) & (g_mask == 0)
+        rg     = (r_mask == 1) & (g_mask == 1) & (b_mask == 0)
+        rb     = (r_mask == 1) & (b_mask == 1) & (g_mask == 0)
+        gb     = (g_mask == 1) & (b_mask == 1) & (r_mask == 0)
+        all_3  = (r_mask == 1) & (g_mask == 1) & (b_mask == 1)
+        none   = (r_mask == 0) & (g_mask == 0) & (b_mask == 0)
+
+        counts = {
+            "Only Red"     : np.sum(only_r),
+            # "Only Green"   : np.sum(only_g),
+            "Only Blue"    : np.sum(only_b),
+            # "Red + Green"  : np.sum(rg),
+            "Red + Blue"   : np.sum(rb),
+            # "Green + Blue" : np.sum(gb),
+            # "All Three"    : np.sum(all_3),
+            "None"         : np.sum(none)
+        }
+
+    elif strategy == 'intensity':
+        counts = {
+            "Red (total)"   : np.sum(r),
+            "Green (total)" : np.sum(g),
+            "Blue (total)"  : np.sum(b)
+        }
+
+    else:
+        raise ValueError("strategy must be 'binary' or 'intensity'")
+
+    # Plot
+    labels = list(counts.keys())
+    values = list(counts.values())
+    colors = ["#d80000",  # red     
+            #   '#43a047',  # green - not used 
+              "#2b00c5",  # blue 
+            #   '#fbc02d',  # yellow - not used
+              "#e22bd3",  # purple/magenta 
+            #   '#00acc1',  # ?
+            #   '#6d4c41',  # all three - not used 
+              '#9e9e9e']  # none
+
+    ax = config_figure(fig_title=f"Pixel Composition ({strategy.capitalize()})", size=(2000, 2000),
+                       face='#FFFFFF')
+
+    ax.pie(values, labels=labels,
+           colors=colors[:len(labels)], 
+           startangle=90, counterclock=False,
+           autopct='%1.1f%%', wedgeprops={'edgecolor': 'white'})
+    
+    plt.tight_layout()
+    if save:
+        plt.savefig(save.with_name("composition_" + save.name), dpi=300)
+        plt.close()
+
+
+def plot_composition_bar(rgb, thresholds=(0.2, 0.2, 0.2), strategy='binary'):
+    """
+    Gera gráfico de barras com base na composição dos canais RGB.
+
+    Parameters
+    ----------
+    rgb : np.ndarray (h, w, 3)
+        Imagem RGB normalizada entre 0 e 1.
+    thresholds : tuple
+        Thresholds por canal (R, G, B).
+    strategy : str
+        'binary' para presença/ausência por pixel, ou
+        'intensity' para soma contínua dos valores dos canais.
+    """
+
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+
+    if strategy == 'binary':
+        r_mask = (r >= thresholds[0]).astype(int)
+        g_mask = (g >= thresholds[1]).astype(int)
+        b_mask = (b >= thresholds[2]).astype(int)
+
+        only_r = (r_mask == 1) & (g_mask == 0) & (b_mask == 0)
+        only_g = (g_mask == 1) & (r_mask == 0) & (b_mask == 0)
+        only_b = (b_mask == 1) & (r_mask == 0) & (g_mask == 0)
+        rg     = (r_mask == 1) & (g_mask == 1) & (b_mask == 0)
+        rb     = (r_mask == 1) & (b_mask == 1) & (g_mask == 0)
+        gb     = (g_mask == 1) & (b_mask == 1) & (r_mask == 0)
+        all_3  = (r_mask == 1) & (g_mask == 1) & (b_mask == 1)
+        none   = (r_mask == 0) & (g_mask == 0) & (b_mask == 0)
+
+        counts = {
+            "Only Red"     : np.sum(only_r),
+            "Only Green"   : np.sum(only_g),
+            "Only Blue"    : np.sum(only_b),
+            "Red + Green"  : np.sum(rg),
+            "Red + Blue"   : np.sum(rb),
+            "Green + Blue" : np.sum(gb),
+            "All Three"    : np.sum(all_3),
+            "None"         : np.sum(none)
+        }
+
+    elif strategy == 'intensity':
+        counts = {
+            "Red (total)"   : np.sum(r),
+            "Green (total)" : np.sum(g),
+            "Blue (total)"  : np.sum(b)
+        }
+
+    else:
+        raise ValueError("strategy must be 'binary' or 'intensity'")
+
+    # Plot
+    labels = list(counts.keys())
+    values = list(counts.values())
+
+    plt.figure(figsize=(7, 5))
+    bars = plt.barh(labels, values, color='skyblue')
+    plt.xlabel("Value")
+    plt.title(f"Pixel Composition ({strategy.capitalize()})")
+
+    for bar in bars:
+        w = bar.get_width()
+        plt.text(w + max(values) * 0.01, bar.get_y() + bar.get_height() / 2,
+                 f"{int(w)}", va='center', fontsize=9)
+
+    plt.tight_layout()
+    if save:
+        plt.savefig(save, dpi=300)
+        plt.close()
