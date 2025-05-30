@@ -443,18 +443,20 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
                             size=(2000, 2000))
         # TODO: probably a problem of underfittin => try to use a larger region to deconvolute 
         ax.plot(x_region, y_region, 
-                color='#383838', lw=.75, ls='-', 
-                label='Original', zorder=3)
+                color='#383838', alpha=.85, lw=1, ls='-', 
+                label='Original', zorder=1)
         ax.plot(x_region, result.best_fit, 
-                color="#E60032", lw=1.2, ls=':', 
+                color="#E60032", lw=1.5, ls=':', 
                 label='Total fit', zorder=2)
         
         comps = result.eval_components(x=x_region)
         for i in range(n_peaks):
             ax.plot(x_region, comps[f"p{i}_"],
-                    alpha=0.75, lw=.5, ls='-', 
+                    color='#E60032', alpha=.75, lw=1, ls=':', 
                     label=f'Peak {i+1}', zorder=2)
-            ax.fill_between(x_region, 0, comps[f"p{i}_"], alpha=.15, zorder=1)
+            ax.fill_between(x_region, 0, comps[f"p{i}_"], 
+                            color='#E60032', alpha=.15, 
+                            zorder=1)
 
         ax.set_xlabel("Raman shift (cm$^{-1}$)")
         ax.set_ylabel("Intensity")
