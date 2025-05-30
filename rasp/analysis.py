@@ -439,18 +439,27 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
         # 4️⃣ Plot
         from rasp.plot_utils import config_figure
 
-        ax = config_figure(fig_title=f"Deconvolution in {region[0]} – {region[1]}"+" cm$^{-1}$",
+        ax = config_figure(fig_title=f"Deconvolution at {region[0]} – {region[1]}"+" cm$^{-1}$",
                             size=(2000, 2000))
         # TODO: probably a problem of underfittin => try to use a larger region to deconvolute 
-        ax.plot(x_region, y_region, 'k-', label='Original')
-        ax.plot(x_region, result.best_fit, 'r--', label='Total fit')
+        ax.plot(x_region, y_region, 
+                color='#383838', lw=.75, ls='-', 
+                label='Original', zorder=3)
+        ax.plot(x_region, result.best_fit, 
+                color="#E60032", lw=1.2, ls=':', 
+                label='Total fit', zorder=2)
+        
         comps = result.eval_components(x=x_region)
         for i in range(n_peaks):
-            ax.plot(x_region, comps[f"p{i}_"], '--', label=f'Peak {i+1}')
+            ax.plot(x_region, comps[f"p{i}_"],
+                    alpha=0.75, lw=.5, ls='-', 
+                    label=f'Peak {i+1}', zorder=2)
+            ax.fill_between(x_region, 0, comps[f"p{i}_"], alpha=.15, zorder=1)
 
         ax.set_xlabel("Raman shift (cm$^{-1}$)")
         ax.set_ylabel("Intensity")
-        
+        ax.set_xlim((min(x_region), max(x_region)))
+        ax.set_ylim((min(y_region), max(1.25*y_region)))
         ax.legend()
         plt.tight_layout()
 
