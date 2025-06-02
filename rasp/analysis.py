@@ -386,7 +386,7 @@ def deconvolve_batch(spectra, labels, region, n_peaks, center_targets,
     - df_result: DataFrame com todas as métricas
     """
     
-    def deconvolve_band(spectrum, width_targets=4):
+    def deconvolve_band(spectrum, width_targets=2):
         """
         Deconvolui uma banda Raman em uma região definida usando modelos Voigt.
 

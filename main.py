@@ -388,14 +388,32 @@ if __name__ == "__main__":
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
     spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
 
-    df = deconvolve_batch(
-            spectra         = spec,
-            labels          = lbls,
-            region          = (813, 883),
-            n_peaks         = 2,
-            center_targets  = [851, 862],
-            fig_folder      = "./figures/deconv/800_900",
-            csv_path        = "./figures/deconv/800_900/metrics.csv")
+    # df = deconvolve_batch(
+    #         spectra         = spec,
+    #         labels          = lbls,
+    #         region          = (813, 883),
+    #         n_peaks         = 2,
+    #         center_targets  = [851, 862],
+    #         fig_folder      = "./figures/deconv/813_883",
+    #         csv_path        = "./figures/deconv/813_883/metrics.csv")
+    
+    # df = deconvolve_batch(
+    #         spectra         = spec,
+    #         labels          = lbls,
+    #         region          = (980, 1180),
+    #         n_peaks         = 6,
+    #         center_targets  = [1010, 1047, 1083, 1108, 1128, 1150],
+    #         fig_folder      = "./figures/deconv/980_1180",
+    #         csv_path        = "./figures/deconv/980_1180/metrics.csv")    
+    
+    # df = deconvolve_batch(
+            # spectra         = spec,
+            # labels          = lbls,
+            # region          = (1550, 1750),
+            # n_peaks         = 1,
+            # center_targets  = [1650],
+            # fig_folder      = "./figures/deconv/1550_1750",
+            # csv_path        = "./figures/deconv/1550_1750/metrics.csv")
 
     # run_bands_metric(spec, lbls, bands)
     # run_bands_analysis(spec, lbls, bands)
