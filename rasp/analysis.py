@@ -366,7 +366,7 @@ def plot_all_metrics(
     # plt.show()
 
 
-def deconvolve_batch(spectra, labels, region, n_peaks,
+def deconvolve_batch(spectra, labels, region, n_peaks, center_targets,
                      save_figs=True, fig_folder="./figures/deconv",
                      save_csv=True, csv_path="./figures/deconv/metrics.csv"):
     """
@@ -386,7 +386,7 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
     - df_result: DataFrame com todas as métricas
     """
     
-    def deconvolve_band(spectrum):
+    def deconvolve_band(spectrum, width_targets=4):
         """
         Deconvolui uma banda Raman em uma região definida usando modelos Voigt.
 
@@ -401,6 +401,8 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
         """
 
         # 1️⃣ Recortar região de interesse
+        if 'kC' in label_str:
+            print('kC')
         x = spectrum.spectral_axis
         y = spectrum.spectral_data
         mask = (x >= region[0]) & (x <= region[1])
@@ -410,10 +412,12 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
         # 2️⃣ Construir modelo composto
         model = None
         params = None
+        
         for i in range(n_peaks):
             prefix = f"p{i}_"
             peak = VoigtModel(prefix=prefix)
-            center_guess = np.linspace(region[0], region[1], n_peaks)[i]
+            # center_guess = np.linspace(region[0], region[1], n_peaks)[i]
+            center_guess = center_targets[i] if i < len(center_targets) else np.mean(region)
             amp_guess = max(y_region)
 
             if model is None:
@@ -427,7 +431,10 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
                 sigma=5,
                 gamma=1,
             )
-
+            # Adiciona restrição de faixa
+            p[f"{prefix}center"].set(min=center_guess - width_targets,
+                                     max=center_guess + width_targets)
+            
             if params is None:
                 params = p
             else:
@@ -443,19 +450,19 @@ def deconvolve_batch(spectra, labels, region, n_peaks,
                             size=(2000, 2000))
         # TODO: probably a problem of underfittin => try to use a larger region to deconvolute 
         ax.plot(x_region, y_region, 
-                color='#383838', alpha=.85, lw=1, ls='-', 
+                color="#464646", alpha=.75, lw=1.3, ls='-', 
                 label='Original', zorder=1)
         ax.plot(x_region, result.best_fit, 
-                color="#E60032", lw=1.5, ls=':', 
+                color="#E60032", lw=1.75, ls=':', 
                 label='Total fit', zorder=2)
         
         comps = result.eval_components(x=x_region)
         for i in range(n_peaks):
             ax.plot(x_region, comps[f"p{i}_"],
-                    color='#E60032', alpha=.75, lw=1, ls=':', 
+                    alpha=.75, lw=1, ls=':', 
                     label=f'Peak {i+1}', zorder=2)
             ax.fill_between(x_region, 0, comps[f"p{i}_"], 
-                            color='#E60032', alpha=.15, 
+                            alpha=.15, 
                             zorder=1)
 
         ax.set_xlabel("Raman shift (cm$^{-1}$)")

@@ -389,12 +389,13 @@ if __name__ == "__main__":
     spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
 
     df = deconvolve_batch(
-            spectra     = spec,
-            labels      = lbls,
-            region      = (820, 885),
-            n_peaks     = 2,
-            fig_folder  = "./figures/deconv/800_900",
-            csv_path    = "./figures/deconv/800_900/metrics.csv")
+            spectra         = spec,
+            labels          = lbls,
+            region          = (813, 883),
+            n_peaks         = 2,
+            center_targets  = [851, 862],
+            fig_folder      = "./figures/deconv/800_900",
+            csv_path        = "./figures/deconv/800_900/metrics.csv")
 
     # run_bands_metric(spec, lbls, bands)
     # run_bands_analysis(spec, lbls, bands)
