@@ -388,14 +388,14 @@ if __name__ == "__main__":
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
     spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
 
-    # df = deconvolve_batch(
-    #         spectra         = spec,
-    #         labels          = lbls,
-    #         region          = (813, 883),
-    #         n_peaks         = 2,
-    #         center_targets  = [851, 862],
-    #         fig_folder      = "./figures/deconv/813_883",
-    #         csv_path        = "./figures/deconv/813_883/metrics.csv")
+    df = deconvolve_batch(
+        spectra         = spec,
+        labels          = lbls,
+        region          = (820, 883),
+        n_peaks         = 2,
+        center_targets  = [851, 862],
+        fig_folder      = "./figures/deconv/813_883_v2",
+        csv_path        = "./figures/deconv/813_883_v2/metrics.csv")
     
     # df = deconvolve_batch(
     #         spectra         = spec,
