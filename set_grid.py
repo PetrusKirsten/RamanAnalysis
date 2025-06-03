@@ -6,7 +6,8 @@ import matplotlib.font_manager as fm
 
 def set_grid(
         title, image_paths, save_path,
-        crop_list: list, cols=4, rows=3, row_labels=["St", "St kCar", "St iCar"]
+        crop_list: list, cols=4, rows=3, row_labels=["St", "St kCar", "St iCar"],
+        facecolor='#09141E', titlecolor='white'
     ):
     
     # === Fonte ===
@@ -16,8 +17,8 @@ def set_grid(
     font_name = prop.get_name()
     plt.rcParams.update({
         'font.family': font_name,
-        'figure.facecolor': '#09141E',
-        'axes.facecolor': '#09141E',
+        'figure.facecolor': facecolor,
+        'axes.facecolor': facecolor,
         'savefig.dpi': 300,
     })
 
@@ -50,7 +51,7 @@ def set_grid(
     ax.set_xlim(-100, final_img.width)
     ax.set_ylim(final_img.height, -100)
 
-    plt.suptitle(title, fontsize=16, color='white', fontproperties=prop)
+    plt.suptitle(title, fontsize=16, color=titlecolor, fontproperties=prop)
 
     for c in range(cols):
         ax.text((c + 0.5) * img_w, -30, col_labels[c], ha='center', va='bottom',
@@ -64,195 +65,354 @@ def set_grid(
     # plt.show()
 
 # === Topograhpy ===
-type = 'topography'
+name = 'topography-outliersAndShading_correction.png'
 
-st = f"./figures/maps/St CLs/local/nearest/topography_40to1785_w-bg_nearest"
-kc = f"./figures/maps/St kC CLs/local/nearest/topography_40to1785_w-bg_nearest"
-ic = f"./figures/maps/St iC CLs/local/nearest/topography_40to1785_w-bg_nearest"
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-17-41"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_15-18-58"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-20-14"
 
 paths_topo = [
-        f"{st}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/St_CL_21_Region_{2}_{type}.png",
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{kc}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/St_kC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
 
-        f"{ic}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
 set_grid(
-    title=f"Total spectrum sum | Topography map", image_paths=paths_topo, save_path=f"{type}_grid.png",
-    crop_list=[0, 240, 2160, 2100]
+    title=f"Total spectrum sum | Topography map", image_paths=paths_topo, save_path=f"./figures/topography_grid.png",
+    crop_list=[60, 260, 
+               1720-60, 1880-260]
 )
 
-st = f"./figures/maps/St CLs/bands_280to1780_no-bg_nearest"
-kc = f"./figures/maps/St kC CLs/bands_280to1780_no-bg_nearest"
-ic = f"./figures/maps/St iC CLs/bands_280to1780_no-bg_nearest"
+# === 478 cm-1 ===
+name = 'band_478-outliersAndShading_correction.png'
 
-# === 478 cm-1 band - raw ===
-band = '478'
-type = f'band_{band}_raw_global'
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-13-57"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_14-58-27"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-00-08"
 
-paths_band = [
-        f"{st}/{band}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/{band}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_21_Region_{2}_{type}.png",
+paths_topo = [
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{kc}/{band}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
 
-        f"{ic}/{band}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
+grid_title = f"Band map at 478" + " cm$^{-1}$"
 set_grid(
-    title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
+    title=grid_title, image_paths=paths_topo, save_path=f"./figures/band_478_grid.png",
+    crop_list=[60, 260, 
+               1720-60, 1880-260]
 )
 
-# === 862 cm-1 band - raw ===
-band = '862'
-type = f'band_{band}_raw_global'
+# === 851 cm-1 ===
+name = 'band_851-outliersAndShading_correction.png'
 
-paths_band = [
-        f"{st}/{band}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/{band}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_21_Region_{2}_{type}.png",
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-13-57"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_14-58-27"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-00-08"
 
-        f"{kc}/{band}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_21_Region_{1}_{type}.png",
+paths_topo = [
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{ic}/{band}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
+
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
+grid_title = f"Band map at 851" + " cm$^{-1}$"
 set_grid(
-    title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
+    title=grid_title, image_paths=paths_topo, save_path=f"./figures/band_851_grid.png",
+    crop_list=[60, 260, 
+               1720-60, 1880-260]
 )
 
-# === 939 cm-1 band - raw ===
-band = '939'
-type = f'band_{band}_raw_global'
+# === 939 cm-1 ===
+name = 'band_939-outliersAndShading_correction.png'
 
-paths_band = [
-        f"{st}/{band}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/{band}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_21_Region_{2}_{type}.png",
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-13-57"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_14-58-27"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-00-08"
 
-        f"{kc}/{band}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_21_Region_{1}_{type}.png",
+paths_topo = [
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{ic}/{band}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
+
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
+grid_title = f"Band map at 939" + " cm$^{-1}$"
 set_grid(
-    title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
+    title=grid_title, image_paths=paths_topo, save_path=f"./figures/band_939_grid.png",
+    crop_list=[60, 260, 
+               1720-60, 1880-260]
 )
 
-# === 1080 cm-1 band - raw ===
-band = '1080'
-type = f'band_{band}_raw_global'
+# === Multibands ===
+name = 'multibands_global_continuous.png'
 
-paths_band = [
-        f"{st}/{band}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/{band}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_21_Region_{2}_{type}.png",
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-13-57"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_14-58-27"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-00-08"
 
-        f"{kc}/{band}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_21_Region_{1}_{type}.png",
+paths_topo = [
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{ic}/{band}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
+
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
+grid_title = "Multibands map | Red: 851 cm$^{-1}$ and Blue: 478 cm$^{-1}$"
 set_grid(
-    title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
+    title=grid_title, image_paths=paths_topo, save_path=f"./figures/multibands_grid.png",
+    crop_list=[60, 140, 
+               1940-60, 1960-140]
 )
 
+# === Multibands composition ===
+name = 'composition_multibands_global_continuous.png'
 
-# === 1650 cm-1 band - raw ===
-band = '1650'
-type = f'band_{band}_raw_global'
+st = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  CLs/run_2025-05-29_15-13-57"
+kc = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  kC CLs/run_2025-05-29_14-58-27"
+ic = f"D:/Documents/GitHub/Raman-Analysis-Software/figures/maps-St  iC CLs/run_2025-05-29_15-00-08"
 
-paths_band = [
-        f"{st}/{band}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/{band}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/{band}/St_CL_21_Region_{2}_{type}.png",
+paths_topo = [
+        f"{st}/Map_St_CL_0_Region_1/{name}",
+        f"{st}/Map_St_CL_7_Region_2/{name}",
+        f"{st}/Map_St_CL_14_Region_2/{name}",
+        f"{st}/Map_St_CL_21_Region_2/{name}",
 
-        f"{kc}/{band}/St_kC_CL_0_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/{band}/St_kC_CL_21_Region_{1}_{type}.png",
+        f"{kc}/Map_St_kC_CL_0_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_7_Region_1/{name}",
+        f"{kc}/Map_St_kC_CL_14_Region_2/{name}",
+        f"{kc}/Map_St_kC_CL_21_Region_1/{name}",
 
-        f"{ic}/{band}/St_iC_CL_0_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/{band}/St_iC_CL_21_Region_{1}_{type}.png",
+        f"{ic}/Map_St_iC_CL_0_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_7_Region_1/{name}",
+        f"{ic}/Map_St_iC_CL_14_Region_2/{name}",
+        f"{ic}/Map_St_iC_CL_21_Region_1/{name}",
 ]
 
+grid_title = "Pixel Distribution by Raman Band Contribution (Red = 478 cm$^{-1}$ and Blue = 851 cm$^{-1}$)"
 set_grid(
-    title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
+    title=grid_title, image_paths=paths_topo, save_path=f"./figures/composition_multibands_grid.png",
+    crop_list=[60, 180, 
+               1940-60, 1920-180],
+    facecolor='#FFFFFF', titlecolor='#383838'
 )
 
-# === multiband - raw ===
-st = f"./figures/maps/St CLs/multi_280to1780_no-bg_nearest"
-kc = f"./figures/maps/St kC CLs/multi_280to1780_no-bg_nearest"
-ic = f"./figures/maps/St iC CLs/multi_280to1780_no-bg_nearest"
+# region
+# st = f"./figures/maps/St CLs/bands_280to1780_no-bg_nearest"
+# kc = f"./figures/maps/St kC CLs/bands_280to1780_no-bg_nearest"
+# ic = f"./figures/maps/St iC CLs/bands_280to1780_no-bg_nearest"
 
-type = f'spectrum_raw'
+# # === 478 cm-1 band - raw ===
+# band = '478'
+# name = f'band_{band}_raw_global'
 
-paths_band = [
-        f"{st}/St_CL_0_Region_{1}_{type}.png",
-        f"{st}/St_CL_7_Region_{2}_{type}.png",
-        f"{st}/St_CL_14_Region_{1}_{type}.png",
-        f"{st}/St_CL_21_Region_{2}_{type}.png",
+# paths_band = [
+#         f"{st}/{band}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/{band}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_21_Region_{2}_{name}.png",
 
-        f"{kc}/St_kC_CL_0_Region_{2}_{type}.png",
-        f"{kc}/St_kC_CL_7_Region_{1}_{type}.png",
-        f"{kc}/St_kC_CL_14_Region_{2}_{type}.png",
-        f"{kc}/St_kC_CL_21_Region_{1}_{type}.png",
+#         f"{kc}/{band}/St_kC_CL_0_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_21_Region_{1}_{name}.png",
 
-        f"{ic}/St_iC_CL_0_Region_{2}_{type}.png",
-        f"{ic}/St_iC_CL_7_Region_{1}_{type}.png",
-        f"{ic}/St_iC_CL_14_Region_{2}_{type}.png",
-        f"{ic}/St_iC_CL_21_Region_{3}_{type}.png",
-]
+#         f"{ic}/{band}/St_iC_CL_0_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_21_Region_{1}_{name}.png",
+# ]
 
-set_grid(
-    title="Multiband maps | R: 862 cm$^{-1}$; G: 939 cm$^{-1}$; B: 1650 cm$^{-1}$;", 
-    image_paths=paths_band, save_path=f"{type}_grid.png",
-    crop_list=[0, 300, 2100, 2000]
-)
+# set_grid(
+#     title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+
+# # === 862 cm-1 band - raw ===
+# band = '862'
+# name = f'band_{band}_raw_global'
+
+# paths_band = [
+#         f"{st}/{band}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/{band}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_21_Region_{2}_{name}.png",
+
+#         f"{kc}/{band}/St_kC_CL_0_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_21_Region_{1}_{name}.png",
+
+#         f"{ic}/{band}/St_iC_CL_0_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_21_Region_{1}_{name}.png",
+# ]
+
+# set_grid(
+#     title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+
+# # === 939 cm-1 band - raw ===
+# band = '939'
+# name = f'band_{band}_raw_global'
+
+# paths_band = [
+#         f"{st}/{band}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/{band}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_21_Region_{2}_{name}.png",
+
+#         f"{kc}/{band}/St_kC_CL_0_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_21_Region_{1}_{name}.png",
+
+#         f"{ic}/{band}/St_iC_CL_0_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_21_Region_{1}_{name}.png",
+# ]
+
+# set_grid(
+#     title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+
+# # === 1080 cm-1 band - raw ===
+# band = '1080'
+# name = f'band_{band}_raw_global'
+
+# paths_band = [
+#         f"{st}/{band}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/{band}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_21_Region_{2}_{name}.png",
+
+#         f"{kc}/{band}/St_kC_CL_0_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_21_Region_{1}_{name}.png",
+
+#         f"{ic}/{band}/St_iC_CL_0_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_21_Region_{1}_{name}.png",
+# ]
+
+# set_grid(
+#     title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+
+
+# # === 1650 cm-1 band - raw ===
+# band = '1650'
+# name = f'band_{band}_raw_global'
+
+# paths_band = [
+#         f"{st}/{band}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/{band}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/{band}/St_CL_21_Region_{2}_{name}.png",
+
+#         f"{kc}/{band}/St_kC_CL_0_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/{band}/St_kC_CL_21_Region_{1}_{name}.png",
+
+#         f"{ic}/{band}/St_iC_CL_0_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/{band}/St_iC_CL_21_Region_{1}_{name}.png",
+# ]
+
+# set_grid(
+#     title=f"Band map at {band} 1/cm", image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+
+# # === multiband - raw ===
+# st = f"./figures/maps/St CLs/multi_280to1780_no-bg_nearest"
+# kc = f"./figures/maps/St kC CLs/multi_280to1780_no-bg_nearest"
+# ic = f"./figures/maps/St iC CLs/multi_280to1780_no-bg_nearest"
+
+# name = f'spectrum_raw'
+
+# paths_band = [
+#         f"{st}/St_CL_0_Region_{1}_{name}.png",
+#         f"{st}/St_CL_7_Region_{2}_{name}.png",
+#         f"{st}/St_CL_14_Region_{1}_{name}.png",
+#         f"{st}/St_CL_21_Region_{2}_{name}.png",
+
+#         f"{kc}/St_kC_CL_0_Region_{2}_{name}.png",
+#         f"{kc}/St_kC_CL_7_Region_{1}_{name}.png",
+#         f"{kc}/St_kC_CL_14_Region_{2}_{name}.png",
+#         f"{kc}/St_kC_CL_21_Region_{1}_{name}.png",
+
+#         f"{ic}/St_iC_CL_0_Region_{2}_{name}.png",
+#         f"{ic}/St_iC_CL_7_Region_{1}_{name}.png",
+#         f"{ic}/St_iC_CL_14_Region_{2}_{name}.png",
+#         f"{ic}/St_iC_CL_21_Region_{3}_{name}.png",
+# ]
+
+# set_grid(
+#     title="Multiband maps | R: 862 cm$^{-1}$; G: 939 cm$^{-1}$; B: 1650 cm$^{-1}$;", 
+#     image_paths=paths_band, save_path=f"{name}_grid.png",
+#     crop_list=[0, 300, 2100, 2000]
+# )
+# endregion
