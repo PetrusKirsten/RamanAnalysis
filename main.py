@@ -157,23 +157,25 @@ def run_spectra(data_folder="./data",
     by_group = defaultdict(list)
     for sp, (grp, conc) in zip(spectra_final, labels_final):
         by_group[grp].append((float(conc), sp))
+
     colors = {
-        "St": ['#E1C96B', '#FFE138', '#F1A836', '#E36E34'],
-        "St kC": ['hotpink', 'mediumvioletred', '#A251C3', '#773AD1'],
-        "St iC": ['lightskyblue', '#62BDC1', '#31A887', '#08653A'],
+        "St"    : ['#E6C889', '#EEA65B', '#F7842E', '#FF6200'],
+        "St kC" : ['#FF1493', '#D221A8', '#A42DBC', '#773AD1'],
+        "St iC" : ['#1E90FF', '#1495CA', '#0A9995', '#009E60'],
     }
+
     for grp, lst in by_group.items():
-        lst_sorted = sorted(lst, key=lambda x: x[0])
+        lst_sorted = sorted(lst, key=lambda x: x[0]) 
         concs, specs = zip(*lst_sorted)
         labels = [f"{int(c)} mM" for c in concs]
         title = f"{grp}"
 
-        plot_stacked(
-            spectra=list(specs), labels=labels, title=title, colors=colors[grp], offset_step=0,
+        plot_stacked(offset_step=0,
+            spectra=list(specs), labels=labels, title=title, colors=colors[grp],
             save=save, out_folder=out_folder, filename=f"spectra_{grp.replace(' ', '_')}_sob.png"
         )
-        plot_stacked(
-            spectra=list(specs), labels=labels, title=title, colors=colors[grp], offset_step=1,
+        plot_stacked(offset_step=1,
+            spectra=list(specs), labels=labels, title=title, colors=colors[grp],
             save=save, out_folder=out_folder, filename=f"spectra_{grp.replace(' ', '_')}_stacked.png"
         )
     
@@ -187,12 +189,12 @@ def run_spectra(data_folder="./data",
         title = f"{int(float(conc))} mM CaCl$_2$"
 
         colors_conc = [colors[grps[0]][2], colors[grps[1]][1], colors[grps[2]][1]]
-        plot_stacked(
-            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc, offset_step=1,
+        plot_stacked(offset_step=1,
+            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc,
             save=save, out_folder=out_folder, filename=f"spectra_{int(float(conc))}mM_stacked.png"
         )
-        plot_stacked(
-            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc, offset_step=0,
+        plot_stacked(offset_step=0,
+            spectra=list(specs), labels=list(grps), title=title, colors=colors_conc,
             save=save, out_folder=out_folder, filename=f"spectra_{int(float(conc))}mM_sob.png"
         )
 
@@ -386,34 +388,43 @@ if __name__ == "__main__":
     }
 
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
-    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
+    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra/spectra-885_965")
 
-    df = deconvolve_batch(
-        spectra         = spec,
-        labels          = lbls,
-        region          = (820, 883),
-        n_peaks         = 2,
-        center_targets  = [851, 862],
-        fig_folder      = "./figures/deconv/813_883_v2",
-        csv_path        = "./figures/deconv/813_883_v2/metrics.csv")
+    # df = deconvolve_batch(
+    #     spectra         = spec,
+    #     labels          = lbls,
+    #     region          = (815, 885),
+    #     n_peaks         = 2,
+    #     center_targets  = [851, 862],  #, 910, 940],
+    #     fig_folder      = "./figures/deconv/815_885",
+    #     csv_path        = "./figures/deconv/815_885/metrics.csv")
     
     # df = deconvolve_batch(
     #         spectra         = spec,
     #         labels          = lbls,
-    #         region          = (980, 1180),
+    #         region          = (985, 1185),
     #         n_peaks         = 6,
     #         center_targets  = [1010, 1047, 1083, 1108, 1128, 1150],
-    #         fig_folder      = "./figures/deconv/980_1180",
-    #         csv_path        = "./figures/deconv/980_1180/metrics.csv")    
+    #         fig_folder      = "./figures/deconv/985_1185",
+    #         csv_path        = "./figures/deconv/985_1185/metrics.csv")    
     
     # df = deconvolve_batch(
-            # spectra         = spec,
-            # labels          = lbls,
-            # region          = (1550, 1750),
-            # n_peaks         = 1,
-            # center_targets  = [1650],
-            # fig_folder      = "./figures/deconv/1550_1750",
-            # csv_path        = "./figures/deconv/1550_1750/metrics.csv")
+    #     spectra         = spec,
+    #     labels          = lbls,
+    #     region          = (885, 965),
+    #     n_peaks         = 2,
+    #     center_targets  = [905, 940],
+    #     fig_folder      = "./figures/deconv/885_965-2",
+    #     csv_path        = "./figures/deconv/885_965-2/metrics.csv")
+
+    # df = deconvolve_batch(
+    #     spectra         = spec,
+    #     labels          = lbls,
+    #     region          = (385, 640),
+    #     n_peaks         = 6,
+    #     center_targets  = [410, 440, 478, 510, 585, 610],
+    #     fig_folder      = "./figures/deconv/385_640",
+    #     csv_path        = "./figures/deconv/385_640/metrics.csv")
 
     # run_bands_metric(spec, lbls, bands)
     # run_bands_analysis(spec, lbls, bands)

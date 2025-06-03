@@ -161,9 +161,9 @@ def plot_stacked(spectra        : list,
                  labels         : list  = None, 
                  title          : str   = "Stacked Raman Spectra", 
                  colors         : list  = [],
-                 size           : tuple = (4500, 2000), 
-                 linewidth      : float = 1.75, 
-                 transp         : float = 0.75, 
+                 size           : tuple = (2000, 2000), 
+                 linewidth      : float = 1.25, 
+                 transp         : float = 0.65, 
                  offset_step    : float = 1,
                  highlight_peaks: bool  = True, 
                  peak_prominence: float = 0.05,
@@ -201,7 +201,7 @@ def plot_stacked(spectra        : list,
     
     start, stop, step = 300, 1800, 100
     locs = np.arange(start, stop + step, step)
-    ax.xaxis.set_major_locator(FixedLocator(locs)); ax.xaxis.set_minor_locator(MultipleLocator(20))
+    # ax.xaxis.set_major_locator(FixedLocator(locs)); ax.xaxis.set_minor_locator(MultipleLocator(20))
     
     ax.tick_params(which='major', length=6); ax.tick_params(which='minor', length=3)
 
