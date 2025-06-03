@@ -388,7 +388,7 @@ if __name__ == "__main__":
     }
 
     # spec, lbls = run_spectra_precursors("./data", save=True, out_folder="./figures/spectra")
-    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra/spectra-885_965")
+    spec, lbls = run_spectra("./data", save=True, out_folder="./figures/spectra")
 
     # df = deconvolve_batch(
     #     spectra         = spec,
